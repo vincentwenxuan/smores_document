@@ -1,47 +1,4 @@
-/*
-2015.6.3
-Smores mother board main code
-Location: Embedded/ecosystem/projects/smores_stm32
-
-
-
-Overview:
-This code is for uploading to the stm32(???model number) in the motherboard of SMORES
-
-(---what this code mainly do---)
-
-
-
-
-*/
-
-
-
-#include "common_peripherals.h"
-#include "system_clock.h"
-#include "mBus.h"
-// common components 
-#include "common_message_types.h" 
-// common messages
-#include "usb_interface.h"        
-// usb interface
-//#include "mBus.h"
-
-// common libraries
-#include "project_message_types.h"
-#include "error_reporting.h"
-#include <string.h> 
-//needed for memset
-//#define   mBUS 1
-
-// user libraries
-#include "Wheel_Control.h"
-#include "Trajectory.h"
-
-//#define TELECONTROL
-//#define POSITION_CONTROL
-//#define SPEED_CONTROL
-
+//kkkkkkkkkkkkkkkkkkkk
 // face ping request messages:
 #define LEFT_FACE_PING   121
 #define RIGHT_FACE_PING  122
