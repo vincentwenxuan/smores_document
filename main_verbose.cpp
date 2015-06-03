@@ -1,4 +1,47 @@
-//kkkkkkkkkkkkkkkkkkkk
+/*
+2015.6.3
+Smores mother board main code
+Location: Embedded/ecosystem/projects/smores_stm32
+
+
+
+Overview:
+This code is for uploading to the stm32(???model number) in the motherboard of SMORES
+
+(---what this code mainly do---)
+
+
+
+
+*/
+
+
+
+#include "common_peripherals.h"
+#include "system_clock.h"
+#include "mBus.h"
+// common components 
+#include "common_message_types.h" 
+// common messages
+#include "usb_interface.h"        
+// usb interface
+//#include "mBus.h"
+
+// common libraries
+#include "project_message_types.h"
+#include "error_reporting.h"
+#include <string.h> 
+//needed for memset
+//#define   mBUS 1
+
+// user libraries
+#include "Wheel_Control.h"
+#include "Trajectory.h"
+
+//#define TELECONTROL
+//#define POSITION_CONTROL
+//#define SPEED_CONTROL
+
 // face ping request messages:
 #define LEFT_FACE_PING   121
 #define RIGHT_FACE_PING  122
@@ -419,10 +462,11 @@ int main (void){
         uint8_t is_data = 0;
 
         //XJ: read the command from USB
-       
         usb.GetBytes();
         while(usb.PeekPacket(&rx_data, &rx_length)) {
             uint8_t type = rx_data[0];
+
+            //XJ: send data to the buffer?
             if(type == MsgCmdType) {
                 mGreenTOGGLE;
                 MsgCmd *rx_msg = ((MsgCmd*) (rx_data+1));
@@ -434,6 +478,8 @@ int main (void){
                     is_data = 1;
                 }
             }
+
+            //XJ: choose a face and set the magnet on or off
             else if (type == MsgMagnetType) {
                 MsgMagnet *rx_msg = ((MsgMagnet*) (rx_data+1));
                 switch (rx_msg->face) {
@@ -487,16 +533,22 @@ int main (void){
                     break;
                 }
             }
+
+            //XJ: control mode
             else if(type == MsgControlType) {
                 MsgControl *rx_msg = ((MsgControl*) (rx_data+1));
                 switch (rx_msg->face_id) {
                 case LEFT_DOF:
                     switch (rx_msg->cmd) {
+                    
+                    //XJ: get the goal position and velocity.
                     case UPDATE_GOAL:
 //                        mRedTOGGLE;
                         left_wheel_stateGoal.Position = rx_msg->goal_position;
                         left_wheel_stateGoal.Speed = rx_msg->goal_velocity;
                         break;
+                    
+                    //XJ: sent the goal postion velocity to the buffer.
                     case SEND_DATA:
                         mWhiteTOGGLE;
                         MsgCurrentState tx_msg;
@@ -512,11 +564,15 @@ int main (void){
                     break;
                 case RIGHT_DOF:
                     switch (rx_msg->cmd) {
+                    
+                    //XJ: get the goal position and velocity.
                     case UPDATE_GOAL:
 //                        mRedTOGGLE;
                         right_wheel_stateGoal.Position = rx_msg->goal_position;
                         right_wheel_stateGoal.Speed = rx_msg->goal_velocity;
                         break;
+                    
+                    //XJ: sent the goal postion velocity to the buffer.
                     case SEND_DATA:
                         mWhiteTOGGLE;
                         MsgCurrentState tx_msg;
@@ -532,11 +588,15 @@ int main (void){
                     break;
                 case PAN_DOF:
                     switch (rx_msg->cmd) {
+                    
+                    //XJ: get the goal position and velocity.
                     case UPDATE_GOAL:
 //                        mRedTOGGLE;
                         pan_wheel_stateGoal.Position = rx_msg->goal_position;
                         pan_wheel_stateGoal.Speed = rx_msg->goal_velocity;
                         break;
+                    
+                    //XJ: sent the goal postion velocity to the buffer.
                     case SEND_DATA:
                         mWhiteTOGGLE;
                         MsgCurrentState tx_msg;
@@ -552,11 +612,15 @@ int main (void){
                     break;
                 case TILT_DOF:
                     switch (rx_msg->cmd) {
+                    
+                    //XJ: get the goal position and velocity.
                     case UPDATE_GOAL:
 //                        mRedTOGGLE;
                         tilt_wheel_stateGoal.Position = rx_msg->goal_position;
                         tilt_wheel_stateGoal.Speed = rx_msg->goal_velocity;
                         break;
+                    
+                    //XJ: sent the goal postion velocity to the buffer.    
                     case SEND_DATA:
                         mWhiteTOGGLE;
                         MsgCurrentState tx_msg;
@@ -572,6 +636,8 @@ int main (void){
                     break;
                 }
             }
+
+            //XJ: do the trjectory, get the arrays of position of velocity.
             else if(type == MsgTrajectoryPositionType) {
                 power_on_flag = 0;
                 MsgTrajectoryPosition *rx_msg = ((MsgTrajectoryPosition*) (rx_data+1));
@@ -782,6 +848,8 @@ int main (void){
                     break;
                 }
             }
+
+            //XJ: do the trajectory velocity
             else if(type == MsgTrajectoryVelocityType) {
                 power_on_flag = 0;
                 MsgTrajectoryVelocity *rx_msg = ((MsgTrajectoryVelocity*) (rx_data+1));
@@ -901,6 +969,9 @@ int main (void){
                     break;
                 }
             }
+
+            //XJ: set the direction and velocity of the motor.
+            //follow the trajectory?
             else if (type == MsgTorqueType) {
                 power_on_flag = 0;
                 MsgTorque *rx_msg = ((MsgTorque*) (rx_data+1));
@@ -961,22 +1032,33 @@ int main (void){
             }
             usb.DropPacket();
         }
+
+        //XJ: if the buffer is filled with data, send them.
         if(is_data) {
             is_data = 0;
             usb.SendNow();
         }
 
+        //XJ: when the power is on, do the following things
+        //This section is the first part the SMORES will do when power on.
+        /**
+        Get the current state when power on, then set the motor to the current state.
+        The position is held everytime we power on the SMORES.
+        **/
         if (power_on_flag)
         {
             cmd = GET_STATES;
             mBusReadBurst(slave_addr_left, cmd, 7, data_left, 1);
             if (data_left[6]==0xAA)
             {
+                //XJ: get the current state
                 mYellowTOGGLE;
                 current_velocity_left = data_left[0] + (data_left[1] << 8) + (data_left[2] << 16) + (data_left[3] << 24);
                 current_position_left = data_left[4] + (data_left[5] << 8);
                 left_wheel_currentState.Position = current_position_left;
                 left_wheel_currentState.Speed = current_velocity_left;
+                
+                //XJ: set the goal state to the current state.
                 if (counter_left_power_on)
                 {
                     left_wheel_stateGoal.Position = current_position_left;
@@ -990,11 +1072,14 @@ int main (void){
             mBusReadBurst(slave_addr_right, cmd, 7, data_right, 1);
             if (data_right[6]==0xAA)
             {
+                //XJ: get the current state
                 mYellowTOGGLE;
                 current_velocity_right = data_right[0] + (data_right[1] << 8) + (data_right[2] << 16)  + (data_right[3] << 24);
                 current_position_right = data_right[4] + (data_right[5] << 8);
                 right_wheel_currentState.Position = current_position_right;
                 right_wheel_currentState.Speed = current_velocity_right;
+                
+                //XJ: set the goal state to the current state.
                 if (counter_right_power_on)
                 {
                     right_wheel_stateGoal.Position = current_position_right;
@@ -1019,6 +1104,7 @@ int main (void){
 
             if (pan_ready_flag && tilt_ready_flag && (data_pan[6]==0xAA) && (data_tilt[6]==0xAA))
             {
+                //XJ: get the current state
 //                pan_ready_flag = 0;
                 start_flag_pan = 1;
                 start_flag_tilt = 1;
@@ -1031,6 +1117,7 @@ int main (void){
                 current_position_tilt = data_tilt[4] + (data_tilt[5] << 8);
                 tilt_wheel_currentState.Position = current_position_tilt;
                 tilt_wheel_currentState.Speed = current_velocity_tilt;
+                //XJ: set the goal state to the current state.
                 if (counter_pan_power_on && counter_tilt_power_on)
                 {
                     pan_wheel_stateGoal.Position = current_position_pan;
@@ -1068,6 +1155,8 @@ int main (void){
 //             }
         }
 
+        //XJ: init the state when the flag is on.
+        // Set the SMORES to the initial position.
         if (init_flag_left)
         {
             left_wheel_stateGoal.Position = 0;
@@ -1076,6 +1165,7 @@ int main (void){
             cmd = GET_STATES;
             mBusReadBurst(slave_addr_left, cmd, 7, data_left, 1);
 
+            //XJ: get the current state, so trajectory could be generated.
             if (data_left[6]==0xAA)
             {
                 start_flag_left = 1;
