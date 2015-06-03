@@ -1,3 +1,22 @@
+/*
+2015.6.3
+Smores mother board main code
+Location: Embedded/ecosystem/projects/smores_stm32
+
+
+
+Overview:
+This code is for uploading to the stm32(???model number) in the motherboard of SMORES
+
+(---what this code mainly do---)
+
+
+
+
+*/
+
+
+
 #include "common_peripherals.h"
 #include "system_clock.h"
 #include "mBus.h"
