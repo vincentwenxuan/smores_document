@@ -6,7 +6,7 @@ Location: Embedded/ecosystem/projects/smores_stm32
 
 
 Overview:
-This code is for uploading to the stm32(???model number) in the motherboard of SMORES
+This code is for uploading to the STM32F303XC in the motherboard of SMORES
 
 (---what this code mainly do---)
 
@@ -18,55 +18,62 @@ This code is for uploading to the stm32(???model number) in the motherboard of S
 
 
 
+// 
 
-#include "common_peripherals.h"
-#include "system_clock.h"
-#include "mBus.h"
+#include "common_peripherals.h"   // where ? 
+#include "system_clock.h"         // ?? 
+#include "mBus.h"             // TWX: location: ecosystem/stm32/c/user/inc
 // common components 
-#include "common_message_types.h" 
+#include "common_message_types.h"   // TWX: location: ecosystem/common/c/user/inc
 // common messages
-#include "usb_interface.h"        
+#include "usb_interface.h"    // TWX: location: ecosystem/common/cpp/user/inc
 // usb interface
 //#include "mBus.h"
 
 // common libraries
-#include "project_message_types.h"
+#include "project_message_types.h"  // ??
 #include "error_reporting.h"
 #include <string.h> 
 //needed for memset
 //#define   mBUS 1
 
 // user libraries
-#include "Wheel_Control.h"
-#include "Trajectory.h"
+#include "Wheel_Control.h"   // TWX: ecosystem/smores_common/cpp/inc 
+#include "Trajectory.h"      // TWX: ecosystem/smores_common/cpp/inc 
 
 //#define TELECONTROL
 //#define POSITION_CONTROL
 //#define SPEED_CONTROL
 
+
+//TWX: what's this for (in which part it was used)
 // face ping request messages:
 #define LEFT_FACE_PING   121
 #define RIGHT_FACE_PING  122
 #define TOP_FACE_PING    123
 #define BOTTOM_FACE_PING 124
 
+//TWX: what's this for (in which part it was used)
 /*   face macros:   */
 #define LEFT_FACE 21  // left
 #define RIGHT_FACE 22  // right
 #define TOP_FACE 23  // top
 #define BOTTOM_FACE 24  // bottom
 
+//TWX: address in I2C communication
 /*   face i2c address macros:  */
 #define BOTTOM_FACE_I2C_ADDRESS 0x0B
 #define LEFT_FACE_I2C_ADDRESS   0x0A
 #define RIGHT_FACE_I2C_ADDRESS  0x0C
 #define TOP_FACE_I2C_ADDRESS    0x0D
 
+//TWX: what's this for (in which part it was used)
 /*   face board macros:   */
 #define MAGNETS_ON  0xA2
 #define MAGNETS_OFF 0xA3
 #define FACE_PING   0xA5
 
+//TWX: what's this for (in which part it was used)
 // feecback cmd
 #define GET_STATES 0xA4
 
