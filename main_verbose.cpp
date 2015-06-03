@@ -196,8 +196,8 @@ int main (void){
     UsbInterface usb = UsbInterface();
     usb.Init();
 
-    //XJ
-    // magnet on-off command;
+    //XJ: magnet on-off command;
+     
     char slave_cmd;
 
     // power on flag
@@ -219,8 +219,8 @@ int main (void){
     Motor right_pan_tilt_motor;
     Motor left_pan_tilt_motor;
 
-    //XJ
-    // right inner motor init
+    //XJ: right inner motor init
+
     right_pan_tilt_motor.GPIO_Direction_GPIOx = GPIOB;
     right_pan_tilt_motor.GPIO_Direction_Pin = GPIO_Pin_2;
     right_pan_tilt_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOB;
@@ -237,8 +237,8 @@ int main (void){
     right_pan_tilt_motor.speed = 0;
     Motor_Init(right_pan_tilt_motor);
     
-    //XJ
-    // left inner motor init
+    //XJ: left inner motor init
+   
     left_pan_tilt_motor.GPIO_Direction_GPIOx = GPIOB;
     left_pan_tilt_motor.GPIO_Direction_Pin = GPIO_Pin_15;
     left_pan_tilt_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOB;
@@ -255,8 +255,8 @@ int main (void){
     left_pan_tilt_motor.speed = 0;
     Motor_Init(left_pan_tilt_motor);
 
-    //XJ
-    // right face motor init
+    //XJ: right face motor init
+    
     right_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
     right_wheel_motor.GPIO_Direction_Pin = GPIO_Pin_10;
     right_wheel_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOA;
@@ -273,8 +273,8 @@ int main (void){
     right_wheel_motor.speed = 0;
     Motor_Init(right_wheel_motor);
 
-    //XJ
-    // left face motor init
+    //XJ: left face motor init
+    
     left_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
     left_wheel_motor.GPIO_Direction_Pin = GPIO_Pin_0;
     left_wheel_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOA;
@@ -291,24 +291,20 @@ int main (void){
     left_wheel_motor.speed = 0;
     Motor_Init(left_wheel_motor);
 
-    //XJ
-    // motor min-max speed?
+    //XJ: motor min-max speed
     int8_t motor_cmd_min = -50;
     uint8_t motor_cmd_max = 50;
 
-    //XJ
-    // motor min-max position
+    //XJ: motor min-max position
     float min_pos = -32767;
     float max_pos = 32767;
 
-    //XJ
-    // left face motor PID control
+    //XJ: left face motor PID control
     float Kp = 0.018, Ki = 0, Kd = 0.0002;
     PID_Controller left_wheel_pid_controller(Kp, Ki, Kd, motor_cmd_min, motor_cmd_max);
     Wheel_Controller_OneMotor left_wheel_control(&left_wheel_pid_controller, left_wheel_motor);
 
-    //XJ
-    // quintic trajectory init
+    //XJ quintic trajectory init
     float coeff_left[6] = {0,0,0,0,0,0};
     float duration_left = 0;
     Polynomial p_left(coeff_left, 6);
@@ -317,8 +313,7 @@ int main (void){
     uint16_t sectionNum_left = 500;
     Trajectory trajectory_left(startTime_left, endTime_left, sectionNum_left, &p_left);
 
-    //XJ
-    // quintic trajectory velocity init
+    //XJ: quintic trajectory velocity init
     float coeff_speed_left[2] = {0,0};
     Polynomial p_speed_left(coeff_speed_left, 2);
     uint16_t positionNum_left = 164;
@@ -326,8 +321,7 @@ int main (void){
     trajectory_speed_left.GeneratePositionVelocityTrajectory(path_speed_left, &velocity_speed_left);
     update_times_speed_left = positionNum_left;
     
-    //XJ
-    // goal position velocity init
+    //XJ: goal position velocity init
     left_wheel_stateGoal.Position = 0;
     left_wheel_stateGoal.Speed = 0;
     left_wheel_control.setStateGoal(left_wheel_stateGoal);
@@ -341,13 +335,11 @@ int main (void){
     int32_t current_velocity_left = 0;
     int8_t left_wheel_cmd = 0;
 
-    //XJ
-    // right face motor PID control
+    //XJ: right face motor PID control
     PID_Controller right_wheel_pid_controller(Kp, Ki, Kd, motor_cmd_min, motor_cmd_max);
     Wheel_Controller_OneMotor right_wheel_control(&right_wheel_pid_controller, right_wheel_motor);
 
-    //XJ
-    // quintic trajectory init
+    //XJ: quintic trajectory init
     float coeff_right[6] = {0,0,0,0,0,0};
     float duration_right = 0;
     Polynomial p_right(coeff_right, 6);
@@ -356,8 +348,7 @@ int main (void){
     uint16_t sectionNum_right = 500;
     Trajectory trajectory_right(startTime_right, endTime_right, sectionNum_right, &p_right);
 
-    //XJ
-    // quintic trajectory velocity init
+    //XJ: quintic trajectory velocity init
     float coeff_speed_right[2] = {0,0};
     Polynomial p_speed_right(coeff_speed_right, 2);
     uint16_t positionNum_right = 164;
@@ -365,8 +356,7 @@ int main (void){
     trajectory_speed_right.GeneratePositionVelocityTrajectory(path_speed_right, &velocity_speed_right);
     update_times_speed_right = positionNum_right;
     
-    //XJ
-    // goal position velocity init
+    //XJ: goal position velocity init
     right_wheel_stateGoal.Position = 0;
     right_wheel_stateGoal.Speed = 0;
     right_wheel_control.setStateGoal(right_wheel_stateGoal);
@@ -388,8 +378,7 @@ int main (void){
     PID_Controller wheel_pid_controller_tilt(Kp, Ki, Kd_tilt, motor_cmd_min, motor_cmd_max);
     Wheel_Controller_Pan_Tilt wheel_control_pan_tilt(&wheel_pid_controller_pan, &wheel_pid_controller_tilt, left_pan_tilt_motor, right_pan_tilt_motor);
 
-    //XJ
-    // pan quintic trajectory init
+    //XJ: pan quintic trajectory init
     float coeff_pan[6] = {0,0,0,0,0,0};
     float duration_pan = 0;
     Polynomial p_pan(coeff_pan, 6);
@@ -398,8 +387,7 @@ int main (void){
     uint16_t sectionNum_pan = 500;
     Trajectory trajectory_pan(startTime_pan, endTime_pan, sectionNum_pan, &p_pan);
 
-    //XJ
-    // pan quintic trajecoty velocity init
+    //XJ: pan quintic trajecoty velocity init
     float coeff_speed_pan[2] = {0,0};
     Polynomial p_speed_pan(coeff_speed_pan, 2);
     uint16_t positionNum_pan = 164;
@@ -407,8 +395,7 @@ int main (void){
     trajectory_speed_pan.GeneratePositionVelocityTrajectory(path_speed_pan, &velocity_speed_pan);
     update_times_speed_pan = positionNum_pan;
     
-    //XJ
-    //goal position velocity init
+    //XJ: goal position velocity init
     pan_wheel_stateGoal.Position = 0;
     pan_wheel_stateGoal.Speed = 0;
 
@@ -444,14 +431,12 @@ int main (void){
     int16_t current_position_tilt = 0;
     int32_t current_velocity_tilt = 0;
 
-    //XJ
-    // turn on the LEDS and turn off them when power on
+    //XJ: turn on the LEDS and turn off them when power on
     mWhiteON;mRedON;mBlueON;mYellowON;
     DelayMilliseconds(1000);
     mWhiteOFF;mRedOFF;mBlueOFF;mYellowOFF;
 
-    //XJ
-    // flag init
+    //XJ: flag init
     start_flag_left = 0;
     start_flag_right = 0;
     start_flag_pan = 0;
@@ -476,8 +461,8 @@ int main (void){
         uint8_t rx_length;
         uint8_t is_data = 0;
 
-        //XJ
-        //read the command from USB
+        //XJ: read the command from USB
+       
         usb.GetBytes();
         while(usb.PeekPacket(&rx_data, &rx_length)) {
             uint8_t type = rx_data[0];
