@@ -16,8 +16,6 @@ This code is for uploading to the stm32(???model number) in the motherboard of S
 */
 
 
-// This sentence is for testing
-
 
 
 
