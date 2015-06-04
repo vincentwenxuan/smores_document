@@ -20,7 +20,7 @@ speed control
 
 
 Questions: 
-using so much flag maybe not a good idea for readability?? Is there other way?
+using so much flag maybe not a good idea for readability(especially they are not commented)?? Is there other way?
 Can the declaration of variables put outside as a file?
 Can the different part be seperated into different files so that the main.cpp will not be so long. So that it can show the high level construction of this code 
 
