@@ -11,6 +11,19 @@ This code is for uploading to the STM32F303XC in the motherboard of SMORES
 (---what this code mainly do---)
 
 
+receive command and execute
+generate trajectories
+PID control 
+position control
+torque control
+speed control
+
+
+Questions: 
+using so much flag maybe not a good idea for readability?? Is there other way?
+Can the declaration of variables put outside as a file?
+Can the different part be seperated into different files so that the main.cpp will not be so long. So that it can show the high level construction of this code 
+
 
 
 */
@@ -79,13 +92,17 @@ This code is for uploading to the STM32F303XC in the motherboard of SMORES
 #define UPDATE_GOAL 10
 #define SEND_DATA   20
 
+
+//TWX: these declaration of variables needs to be reorganized(which belongs to which part) and put outside
+
 float path_left[501];
 float velocity_left[501];    // max is 100s
 
 float path_speed_left[165];
 float velocity_speed_left;    // max is 40000
 
-PID_State left_wheel_stateGoal;
+
+PID_State left_wheel_stateGoal; //TWX: Class definition in ecosystem/smores_common/cpp/inc/PID_control.h . this is for setting goal position and speed of a wheel
 bool init_flag_left;
 bool global_flag_left;
 bool start_flag_left;
@@ -178,7 +195,7 @@ uint16_t handleFacePing(uint16_t cmd) {
     switch(cmd) {
     case LEFT_FACE_PING:
         //mBusReadBurst(0b01, FACE_PING, 1, &data, 1);
-        data = mBusRead(LEFT_FACE_I2C_ADDRESS<<1, FACE_PING, 1);
+        data = mBusRead(LEFT_FACE_I2C_ADDRESS<<1, FACE_PING, 1);   // TWX: what <<1 means here?
         break;
     case RIGHT_FACE_PING:
         data = mBusRead(RIGHT_FACE_I2C_ADDRESS<<1, FACE_PING, 1);
@@ -222,13 +239,13 @@ int main (void){
     bool torque_flag_pan_tilt = 0;
     
     // feedback control init part
-    Motor left_wheel_motor;
+    Motor left_wheel_motor;     //TWX: class definition in ecosystem/smores_common/cpp/inc/DC_Motor.h 
     Motor right_wheel_motor;
     Motor right_pan_tilt_motor;
     Motor left_pan_tilt_motor;
 
     //XJ: right inner motor init
-
+    //TWX: definition in ecosystem/smores_common/cpp/inc/DC_Motor.h 
     right_pan_tilt_motor.GPIO_Direction_GPIOx = GPIOB;
     right_pan_tilt_motor.GPIO_Direction_Pin = GPIO_Pin_2;
     right_pan_tilt_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOB;
@@ -369,6 +386,7 @@ int main (void){
     right_wheel_stateGoal.Speed = 0;
     right_wheel_control.setStateGoal(right_wheel_stateGoal);
 
+
     PID_State right_wheel_currentState;
 
     char slave_addr_right = 0x18;
@@ -378,6 +396,10 @@ int main (void){
     int16_t current_position_right = 0;
     int32_t current_velocity_right = 0;
     int8_t right_wheel_cmd = 0;
+
+
+
+
 
     // pan and tilt DoF control
     float Kd_pan = 0.00011;
@@ -401,7 +423,7 @@ int main (void){
     uint16_t positionNum_pan = 164;
     Trajectory trajectory_speed_pan(positionNum_pan, min_pos, max_pos, &p_speed_pan);
     trajectory_speed_pan.GeneratePositionVelocityTrajectory(path_speed_pan, &velocity_speed_pan);
-    update_times_speed_pan = positionNum_pan;
+    update_times_speed_pan = positionNum_pan;  //TWX:  ??
     
     //XJ: goal position velocity init
     pan_wheel_stateGoal.Position = 0;
@@ -439,6 +461,9 @@ int main (void){
     int16_t current_position_tilt = 0;
     int32_t current_velocity_tilt = 0;
 
+
+
+
     //XJ: turn on the LEDS and turn off them when power on
     mWhiteON;mRedON;mBlueON;mYellowON;
     DelayMilliseconds(1000);
@@ -452,7 +477,7 @@ int main (void){
     pan_ready_flag = 0;
     tilt_ready_flag = 0;
     char cmd;
-    PlayTimebase();
+    PlayTimebase();  //TWX: what is playtimebase??
     // feedback control part end //
 
     //XJ
@@ -470,11 +495,13 @@ int main (void){
         uint8_t is_data = 0;
 
         //XJ: read the command from USB
+        //TWX: to rx_data, the cmd type is defined by rx_data[0], which could be MsgCmdType MsgMagnetType MsgControlType MsgTrajectoryPositionType  MsgTrajectoryVelocityType MsgTorqueType indicating type of the message received
         usb.GetBytes();
         while(usb.PeekPacket(&rx_data, &rx_length)) {
             uint8_t type = rx_data[0];
 
             //XJ: send data to the buffer?
+            //TWX: what is MsgCmdType? and where can we find it
             if(type == MsgCmdType) {
                 mGreenTOGGLE;
                 MsgCmd *rx_msg = ((MsgCmd*) (rx_data+1));
@@ -489,7 +516,7 @@ int main (void){
 
             //XJ: choose a face and set the magnet on or off
             else if (type == MsgMagnetType) {
-                MsgMagnet *rx_msg = ((MsgMagnet*) (rx_data+1));
+                MsgMagnet *rx_msg = ((MsgMagnet*) (rx_data+1)); 
                 switch (rx_msg->face) {
                 case LEFT_FACE:
 //                    mWhiteTOGGLE;
@@ -543,6 +570,8 @@ int main (void){
             }
 
             //XJ: control mode
+            // TWX: reads msgfrom 
+
             else if(type == MsgControlType) {
                 MsgControl *rx_msg = ((MsgControl*) (rx_data+1));
                 switch (rx_msg->face_id) {
@@ -1055,9 +1084,9 @@ int main (void){
         **/
         if (power_on_flag)
         {
-            cmd = GET_STATES;
-            mBusReadBurst(slave_addr_left, cmd, 7, data_left, 1);
-            if (data_left[6]==0xAA)
+            cmd = GET_STATES;  
+            mBusReadBurst(slave_addr_left, cmd, 7, data_left, 1); // TWX: communication with other faceboard, what specifically(check the header)??
+            if (data_left[6]==0xAA)  //TWX: what does this do? means available?
             {
                 //XJ: get the current state
                 mYellowTOGGLE;
@@ -1110,7 +1139,7 @@ int main (void){
                 tilt_ready_flag = 1;
             }
 
-            if (pan_ready_flag && tilt_ready_flag && (data_pan[6]==0xAA) && (data_tilt[6]==0xAA))
+            if (pan_ready_flag && tilt_ready_flag && (data_pan[6]==0xAA) && (data_tilt[6]==0xAA))  //TWX: when pan-tilt wheel are both ready
             {
                 //XJ: get the current state
 //                pan_ready_flag = 0;
@@ -1165,7 +1194,10 @@ int main (void){
 
         //XJ: init the state when the flag is on.
         // Set the SMORES to the initial position.
-        if (init_flag_left)
+        //TWX: ?? init_flag_left when commanded position, and commanded to init , this flag set to 1,otherwise 0. 
+        //TWX: and when the flag is ON then that wheel will move to 0 position
+
+        if (init_flag_left) 
         {
             left_wheel_stateGoal.Position = 0;
             left_wheel_stateGoal.Speed = 0;
@@ -1186,7 +1218,10 @@ int main (void){
                 left_wheel_cmd = left_wheel_control.updateStateCmd(&usb);
             }
         }
-        else if ((torque_flag_left == 0) && (power_on_flag == 0))
+        //TWX: power_on_flag: this is set to 1, when power on, and then all 0 at othertime.(to check if that is the "first run")
+        //TWX: torque_flag_left: when receive torque control command, this is set to 1, otherwise 0
+
+        else if ((torque_flag_left == 0) && (power_on_flag == 0)) //TWX: this means in torque control mode and not the "first run"(or power-on-run)
         // if (start_control_flag_left || start_control_speed_flag_left)
         {
 //            mRedTOGGLE;
@@ -1206,7 +1241,7 @@ int main (void){
                 left_wheel_cmd = left_wheel_control.updateStateCmd(&usb);
             }
         }
-        else
+        else   //TWX: this is when the left wheel is in mode that's NOT "init" or torque?? is it?
         {
             cmd = GET_STATES;
             mBusReadBurst(slave_addr_left, cmd, 7, data_left, 1);
@@ -1225,6 +1260,8 @@ int main (void){
         //     left_wheel_control.updateState(left_wheel_currentState);
         //     left_wheel_cmd = left_wheel_control.updateStateCmd(&usb);
         // }
+       
+        //TWX: this part is the same as left-wheel control above. they are right-pan-tilt control
         if (init_flag_right)
         {
             right_wheel_stateGoal.Position = 0;
@@ -1409,9 +1446,15 @@ int main (void){
     return(0);
 }
 
-void timerCallback1(void)
+
+
+// TWX: is timercallback triggered every ? seconds? what is the mechanism of updating time with the trajectory?
+void timerCallback1(void)   //TWX: This is for ????
 {
-    if(global_flag_left && start_flag_left)
+    //TWX: global_flag_left: set to 1 when received command of position control
+    //TWX: start_flag_left: ?????
+
+    if(global_flag_left && start_flag_left)  
     {
         mBlueON;
         counter_left++;
@@ -1419,12 +1462,12 @@ void timerCallback1(void)
         {
             counter_left = 0;
             index_position_left++;
-            if(index_position_left <= update_times_left)
+            if(index_position_left <= update_times_left)  //TWX: if it is still running set the goal position(come from trajectory planner) 
             {
                 left_wheel_stateGoal.Position = path_left[index_position_left];
                 left_wheel_stateGoal.Speed = velocity_left[index_position_left];
             }
-            else
+            else  //TWX: what does this if else mean? is it for run or stop??
             {
                 index_position_left = 0;
                 global_flag_left = 0;
@@ -1507,7 +1550,7 @@ void timerCallback1(void)
 //    mWhiteTOGGLE;
 }
 
-void timerCallback2(void)
+void timerCallback2(void)  //TWX: what is this callback for? speed control??
 {
     if(global_flag_speed_left && start_flag_left)
     {
