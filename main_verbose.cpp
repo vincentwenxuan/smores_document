@@ -20,9 +20,17 @@ speed control
 
 
 Questions: 
+
+
 using so much flag maybe not a good idea for readability(especially they are not commented)?? Is there other way?
 Can the declaration of variables put outside as a file?
 Can the different part be seperated into different files so that the main.cpp will not be so long. So that it can show the high level construction of this code 
+
+
+
+
+
+
 
 
 
@@ -325,11 +333,14 @@ int main (void){
     float max_pos = 32767;
 
     //XJ: left face motor PID control
+    //TWX: PID controller definition in ecosystem/projects/smores_pid_control/stm32f303xc/inc/PID_Control.h
+
     float Kp = 0.018, Ki = 0, Kd = 0.0002;
     PID_Controller left_wheel_pid_controller(Kp, Ki, Kd, motor_cmd_min, motor_cmd_max);
     Wheel_Controller_OneMotor left_wheel_control(&left_wheel_pid_controller, left_wheel_motor);
 
     //XJ quintic trajectory init
+    //TWX: Polynomial class definition Embedded/ecosystem/smores_common/cpp/inc/Polynomial.h
     float coeff_left[6] = {0,0,0,0,0,0};
     float duration_left = 0;
     Polynomial p_left(coeff_left, 6);
