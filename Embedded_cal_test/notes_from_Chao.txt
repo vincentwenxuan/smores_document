@@ -1,0 +1,26 @@
+All smores code is named smores_
+
+ecosystem:
+- all smores-specific library files are in smores_common
+- already modify Makefile to compile codes in smores_common
+- DC_Motor, Polynomial, Trajectory, PID_Control, Wheel_Control
+- smores_template and stm32f303_discovery_template
+- smores_pid_control is the previous version of pid controller which is useless now.
+
+atmega:
+- written outside ecosystem (all code in atmega directory)
+- atmega template includes all coding part you need to program ATmega and it can be used independently, but it's not necessary for smores project
+- Projects in project directory
+- To set up new project, copy smores_face_board_template and rename
+- twi = I2C testing
+- wiper_encoder_test is the face board testings setup code
+- the Utility folder allows you do use windows
+- Don't use ATMEL studio in windows. Just use a normal text editor
+- common library includes basic functions (ADC, PWM, etc)
+- example includes the examples of USART, PWM, ADC and TWI
+
+In the Makefile, there are four commands:
+ - make, make flash, make clean, make fuse
+ - with the new atmega chip, you must program the fuse first (when you first start using the chip)
+    - you can't program the chip correctly with make flash before doing this.
+    - it configures the clock.

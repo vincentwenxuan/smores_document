@@ -1,0 +1,11 @@
+display none tOrigin bOrigin;
+group all;
+smash (>0 0);
+display last;
+
+display none tNames bNames tPlace bPlace tValues bValues;
+group all;
+change font vector (>0 0);
+change ratio 15 (>0 0);
+change size 0.6 (>0 0);
+display last;

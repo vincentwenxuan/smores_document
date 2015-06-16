@@ -1,0 +1,38 @@
+Change Magnet state number to the actual i2c address macros (fix this in python) 
+
+Get rid of all these flags 
+
+switch to my wifi sending method use datamanger to access stored structs
+
+More handling functions with following workflow 
+pass the dataManager class/struct to all of them 
+ velocity Handler 
+    '->right_DOF handler 
+	deal with flagging for velocity or torque 
+	'->dof_cmd_handler 
+
+  torque handler 
+   '-> right_DOF handler 
+	deal with flagging for velocityor torque 
+	'-> dof_cmd_handler 
+
+Read Faces funciton 
+'> request_face_state x4  
+ 	'-> write face_state to struct
+		(put vel and pos estimations in here) 
+
+init_wheel_pos (whatever wheel ) 
+   '-> set_face_state 
+
+
+global changing variables / flags can be in device manager 
+
+Setting the face names to be the same number as i2c address 
+
+current_position_right why can't we retrieve from the object? in the callbacks
+
+Need to fix classes So that updateState explain the debug shit but i guess its ok ? 
+
+check header symbol defs
+
+

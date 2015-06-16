@@ -1,0 +1,33 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+*.DS_Store
+*.bin
+*.map
+*.eep
+*.lss
+*.srec
+*.d
+
+# Libraries
+*.lib
+*.a
+*.ini
+
+# Shared objects (inc. Windows DLLs)
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# OS generated files
+.DS_Store
+.DS_Store?

@@ -1,0 +1,66 @@
+#ifndef IC_HEADER_NAMES_H
+#define IC_HEADER_NAMES_H
+  
+#if defined(STM32F37X)
+  #define STM32FXXX_H                 "stm32f37x.h"
+  #define STM32FXXX_ADC_H             "stm32f37x_adc.h"
+  #define STM32FXXX_CAN_H             "stm32f37x_can.h"
+  #define STM32FXXX_CEC_H             "stm32f37x_cec.h"
+  #define STM32FXXX_CRC_H             "stm32f37x_crc.h"
+  #define STM32FXXX_COMP_H            "stm32f37x_comp.h"
+  #define STM32FXXX_DAC_H             "stm32f37x_dac.h"
+  #define STM32FXXX_DBGMCU_H          "stm32f37x_dbgmcu.h"
+  #define STM32FXXX_DMA_H             "stm32f37x_dma.h"
+  #define STM32FXXX_EXTI_H            "stm32f37x_exti.h"
+  #define STM32FXXX_FLASH_H           "stm32f37x_flash.h"
+  #define STM32FXXX_GPIO_H            "stm32f37x_gpio.h"
+  #define STM32FXXX_SYSCFG_H          "stm32f37x_syscfg.h"
+  #define STM32FXXX_I2C_H             "stm32f37x_i2c.h"
+  #define STM32FXXX_IWDG_H            "stm32f37x_iwdg.h"
+  #define STM32FXXX_PWR_H             "stm32f37x_pwr.h"
+  #define STM32FXXX_RCC_H             "stm32f37x_rcc.h"
+  #define STM32FXXX_RTC_H             "stm32f37x_rtc.h"
+  #define STM32FXXX_SDADC_H           "stm32f37x_sdadc.h"
+  #define STM32FXXX_SPI_H             "stm32f37x_spi.h"
+  #define STM32FXXX_TIM_H             "stm32f37x_tim.h"
+  #define STM32FXXX_USART_H           "stm32f37x_usart.h"
+  #define STM32FXXX_WWDG_H            "stm32f37x_wwdg.h"
+  #define STM32FXXX_MISC_H            "stm32f37x_misc.h" 
+  #define STM32FXXX_I2C_CPAL_H        "stm32f37x_i2c_cpal.h" 
+  #define STM32FXXX_I2C_CPAL_HAL_H    "stm32f37x_i2c_cpal_hal.h"      
+  #define STM32FXXX_I2C_CPAL_CONF_H   "stm32f37x_i2c_cpal_conf.h" 
+
+#elif defined(STM32F303xC)
+  #define STM32FXXX_H                 "stm32f30x.h"
+  #define STM32FXXX_ADC_H             "stm32f30x_adc.h"
+  #define STM32FXXX_CAN_H             "stm32f30x_can.h"
+  #define STM32FXXX_CEC_H             "stm32f30x_cec.h"
+  #define STM32FXXX_CRC_H             "stm32f30x_crc.h"
+  #define STM32FXXX_COMP_H            "stm32f30x_comp.h"
+  #define STM32FXXX_DAC_H             "stm32f30x_dac.h"
+  #define STM32FXXX_DBGMCU_H          "stm32f30x_dbgmcu.h"
+  #define STM32FXXX_DMA_H             "stm32f30x_dma.h"
+  #define STM32FXXX_EXTI_H            "stm32f30x_exti.h"
+  #define STM32FXXX_FLASH_H           "stm32f30x_flash.h"
+  #define STM32FXXX_GPIO_H            "stm32f30x_gpio.h"
+  #define STM32FXXX_SYSCFG_H          "stm32f30x_syscfg.h"
+  #define STM32FXXX_I2C_H             "stm32f30x_i2c.h"
+  #define STM32FXXX_IWDG_H            "stm32f30x_iwdg.h"
+  #define STM32FXXX_PWR_H             "stm32f30x_pwr.h"
+  #define STM32FXXX_RCC_H             "stm32f30x_rcc.h"
+  #define STM32FXXX_RTC_H             "stm32f30x_rtc.h"
+  #define STM32FXXX_SDADC_H           "stm32f30x_sdadc.h"
+  #define STM32FXXX_SPI_H             "stm32f30x_spi.h"
+  #define STM32FXXX_TIM_H             "stm32f30x_tim.h"
+  #define STM32FXXX_USART_H           "stm32f30x_usart.h"
+  #define STM32FXXX_WWDG_H            "stm32f30x_wwdg.h"
+  #define STM32FXXX_MISC_H            "stm32f30x_misc.h" 
+  #define STM32FXXX_I2C_CPAL_H        "stm32f30x_i2c_cpal.h" 
+  #define STM32FXXX_I2C_CPAL_HAL_H    "stm32f30x_i2c_cpal_hal.h"      
+  #define STM32FXXX_I2C_CPAL_CONF_H   "stm32f30x_i2c_cpal_conf.h"
+
+#else
+  #error("Unrecognized target. The Makefile should define one of the following: {STM32F37X, STM32F303xC}")
+#endif   
+
+#endif // IC_HEADER_NAMES_H

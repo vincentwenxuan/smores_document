@@ -1,0 +1,15 @@
+# Display layers key bindings
+# Created by Matthew Piccoli and James Paulos 2014/10/13
+
+BRD:
+ASSIGN C+A DISPLAY NONE Pads Vias Dimension Unrouted tPlace tOrigins tDocu bPlace bOrigins bDocu Top Bottom Holes Document Reference;
+ASSIGN CS+A DISPLAY NONE Pads Vias Dimension Unrouted tPlace tOrigins tDocu bPlace bOrigins bDocu Top Bottom;
+ASSIGN C+B DISPLAY NONE Pads Vias Dimension Unrouted Bottom bPlace bOrigins bStop bKeepout bRestrict bDocu;
+ASSIGN CS+B DISPLAY NONE Pads Vias Dimension Unrouted Bottom bPlace bOrigins bDocu;
+ASSIGN C+D DISPLAY TOP BOTTOM ROUTE2 ROUTE3 tNames tPlace tOrigins bNames bPlace bOrigins;;
+ASSIGN C+G DISPLAY NONE Vias Dimension Unrouted Route2;
+ASSIGN C+L DISPLAY NONE Pads Vias Dimension bPlace bStop bKeepout bRestrict bDocu;
+ASSIGN C+T DISPLAY NONE Pads Vias Dimension Unrouted Top tPlace tOrigins tStop tKeepout tRestrict tDocu;
+ASSIGN CS+T DISPLAY NONE Pads Vias Dimension Unrouted Top tPlace tOrigins tDocu;
+ASSIGN C+U DISPLAY NONE Pads Vias Dimension Unrouted tPlace tStop tKeepout tRestrict tDocu;
+ASSIGN C+V DISPLAY NONE Vias Dimension Unrouted Route15;

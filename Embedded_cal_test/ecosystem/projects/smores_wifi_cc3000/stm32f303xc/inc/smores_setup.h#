@@ -1,0 +1,119 @@
+#ifndef SMORES_SETUP_H 
+#define SMORES_SETUP_H
+
+#include "common_peripherals.h"
+#include "system_clock.h"
+#include "mBus.h"
+// common components 
+#include "common_message_types.h" 
+// common messages
+#include "usb_interface.h"        
+// common libraries
+#include "project_message_types.h"
+#include "error_reporting.h"
+#include <string.h> 
+//needed for memset
+//#define   mBUS 1
+
+// user libraries
+#include "Wheel_Control.h"
+#include "Trajectory.h"
+#include "wifi.h"
+
+float path_left[501];
+float velocity_left[501];    // max duration is 5s
+
+float path_speed_left[165];
+float velocity_speed_left;    // max is 40000
+
+PID_State left_wheel_stateGoal;
+bool init_flag_left;
+bool global_flag_left;
+bool start_flag_left;
+int timer_counter_left;
+int update_times_left;
+int16_t counter_left;
+int16_t index_position_left;
+bool start_control_flag_left;
+
+bool global_flag_speed_left;
+int timer_counter_speed_left;
+int update_times_speed_left;
+int16_t counter_speed_left;
+int16_t index_speed_left;
+bool start_control_speed_flag_left;
+
+// variables for right wheel control
+float path_right[501];
+float velocity_right[501];    // max duration is 5s
+
+float path_speed_right[165];
+float velocity_speed_right;    // max is 40000
+
+PID_State right_wheel_stateGoal;
+bool init_flag_right;
+bool global_flag_right;
+bool start_flag_right;
+int timer_counter_right;
+int update_times_right;
+int16_t counter_right;
+int16_t index_position_right;
+bool start_control_flag_right;
+
+bool global_flag_speed_right;
+int timer_counter_speed_right;
+int update_times_speed_right;
+int16_t counter_speed_right;
+int16_t index_speed_right;
+bool start_control_speed_flag_right;
+
+// variables for pan wheel control
+float path_pan[501];
+float velocity_pan[501];    // max duration is 5s
+
+float path_speed_pan[165];
+float velocity_speed_pan;    // max is 40000
+
+PID_State pan_wheel_stateGoal;
+bool init_flag_pan;
+bool global_flag_pan;
+bool start_flag_pan;
+int timer_counter_pan;
+int update_times_pan;
+int16_t counter_pan;
+int16_t index_position_pan;
+bool start_control_flag_pan;
+
+bool global_flag_speed_pan;
+int timer_counter_speed_pan;
+int update_times_speed_pan;
+int16_t counter_speed_pan;
+int16_t index_speed_pan;
+bool start_control_speed_flag_pan;
+
+// variables for tilt control
+float path_tilt[501];
+float velocity_tilt[501];    // max duration is 5s
+
+PID_State tilt_wheel_stateGoal;
+bool init_flag_tilt;
+bool global_flag_tilt;
+bool start_flag_tilt;
+int timer_counter_tilt;
+int update_times_tilt;
+int16_t counter_tilt;
+int16_t index_position_tilt;
+bool start_control_flag_tilt;
+
+bool pan_ready_flag;
+bool tilt_ready_flag;
+
+Motor left_wheel_motor;
+Motor right_wheel_motor;
+Motor right_pan_tilt_motor;
+Motor left_pan_tilt_motor;
+
+void dataManagerInit(DATA_MANAGER_t* data_manager); 
+
+
+#endif 

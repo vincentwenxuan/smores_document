@@ -1,0 +1,15 @@
+Making Top Assembly Guide: Ctrl-Shift-t
+
+  DISPLAY None Pads Unrouted Dimension tPlace tNames tCream Holes tDocu;
+
+Making Bottom Assembly Guide: Ctrl-Shift-b
+
+  DISPLAY None Pads Unrouted Dimension bPlace bNames bCream Holes bDocu;
+
+
+
+
+
+DISPLAY NONE Pads Vias Dimension Unrouted Top tPlace tOrigins tStop tKeepout tRestrict tDocu
+
+DISPLAY NONE Pads Vias Dimension Unrouted Bottom bPlace bOrigins bStop bKeepout bRestrict bDocu

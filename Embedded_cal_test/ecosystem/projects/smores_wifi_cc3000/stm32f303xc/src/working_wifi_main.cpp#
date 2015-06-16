@@ -1,0 +1,270 @@
+#include "common_peripherals.h"
+#include "system_clock.h"
+// common components 
+#include "common_message_types.h" 
+// common messages
+//#include "usb_interface.h"
+// usb interface
+#include "mBus.h"
+
+// common libraries
+#include "project_message_types.h"
+#include "error_reporting.h"
+#include <string.h> 
+//needed for memset
+
+#include "stm32_cc3000.h"
+#include "CC3000_socket.h"
+#include "wifi.h"
+
+#define   mBUS 1 
+
+#define SEND_DATA 10
+#define M_YELLOW_TOGGLE 20
+#define M_WHITE_TOGGLE  30
+void wifi_send(void* data_to_send, long data_size);
+// void wifi_recieve(void);
+void wifi_receive_callback(DATA_MANAGER_t* data_manager);
+/*Declare global variables*/
+char cc3000_device_name[] = "CC3000";
+
+int main (void){
+	InitPeripherals();
+    
+    debug_setup();
+    cc3000_initialize_ip(100);
+    cc3000_startup_check();
+    
+    udp_socket_communication(); //UDP socket communication
+    
+    mYellowON; mRedON; mGreenON; mWhiteON; mBlueON;
+	DelayMilliseconds(100);
+    mYellowOFF;mRedOFF;mGreenOFF; mWhiteOFF; mBlueOFF;
+
+    DATA_MANAGER_t *dataManager =(DATA_MANAGER_t*)malloc(sizeof(DATA_MANAGER_t)); 
+    char test[] = "Init Wifi"; 
+    char * test_buf = test; 
+    wifi_send(test_buf,sizeof(test)); 
+    while(1)
+    {
+
+
+        revLen = recvfrom(revSocket, rev_buf, sizeof(rev_buf), 0, (sockaddr*) &source_addr, &revPacketLen);
+            if(revLen>0)
+            {
+               mRedON;
+               wifi_receive_callback(dataManager); 
+               mRedOFF; 
+            }
+        mBlueTOGGLE;
+        mGreenTOGGLE;
+
+    }
+    return(0);
+}
+
+
+
+void wifi_send(void* data_to_send, long data_size )
+{
+
+    sendto(desSocket, data_to_send, data_size, 0, (sockaddr*) &des_addr, sizeof(des_addr));
+
+} 
+
+void wifi_receive_callback(DATA_MANAGER_t* data_manager)
+{
+    DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager;
+
+    uint8_t  msg_id = rev_buf[0];  
+    switch (msg_id)
+    {
+        case MsgBrainIpType: 
+        {
+            MsgBrainIp *rx_msg = (MsgBrainIp*)(rev_buf); 
+           
+            memset((char *)&des_addr, 0, sizeof(des_addr));
+            des_addr.sin_family       = AF_INET;
+            des_addr.sin_port         = htons(rx_msg->brain_socket);
+            des_addr.sin_addr.s_addr  = rx_msg->brain_ip;
+
+            char status_msg[] = "changed dest ip"; 
+            char *msg_buf = status_msg; 
+            debug_write_ip(des_addr.sin_addr.s_addr); 
+            wifi_send(msg_buf, sizeof(status_msg)); 
+            //sendto(desSocket,msg_buf,sizeof(status_msg),0, (sockaddr*) &new_addr, sizeof(new_addr));
+
+            break;  
+        }
+         case MsgControlType: // assuming setting states
+        {
+            MsgControl *rx_msg = (MsgControl*)(rev_buf); 
+            dataManager->control_struct.type = MsgControlType; 
+            dataManager->control_struct.face_id = rx_msg->face_id;
+            dataManager->control_struct.cmd = rx_msg->cmd;
+            dataManager->control_struct.goal_position = rx_msg->goal_position;
+            dataManager->control_struct.goal_velocity = rx_msg->goal_velocity;
+
+            break; 
+        }
+        case MsgCmdType:
+        {
+
+            MsgCmd *rx_msg = (MsgCmd*)(rev_buf);  
+            dataManager->cmd_struct.type = MsgCmdType; 
+            dataManager->cmd_struct.cmd = rx_msg->cmd; 
+            
+            break; 
+        }
+        case MsgMagnetType:
+        { 
+            MsgMagnet *rx_msg = (MsgMagnet*)(rev_buf); 
+            dataManager->magnet_struct.type = MsgMagnetType; 
+            dataManager->magnet_struct.face = rx_msg->face;
+            dataManager->magnet_struct.state = rx_msg->state;
+       
+            break; 
+        }
+        case MsgCurrentStateType: 
+        {
+            
+            dataManager->currentstate_struct.type = MsgCurrentStateType; 
+      
+            wifi_send((void *)&(dataManager->currentstate_struct),sizeof(dataManager->currentstate_struct)); 
+            break; 
+        }
+        case MsgModuleType: 
+        {
+            MsgModule *rx_msg = (MsgModule*)(rev_buf); 
+
+            dataManager->module_struct.type = MsgModuleType; 
+            dataManager->module_struct.data = rx_msg->data;
+            
+            break;
+        }
+        case MsgStatesType:
+        {
+            break;
+        }
+
+        case MsgTrajectoryPositionType:
+        { 
+            MsgTrajectoryPosition *rx_msg = (MsgTrajectoryPosition*)(rev_buf); 
+
+            dataManager->trajectory_pos_struct.type = MsgTrajectoryPositionType; 
+            dataManager->trajectory_pos_struct.face_id = rx_msg->face_id; 
+            dataManager->trajectory_pos_struct.cmd = rx_msg->cmd; 
+            dataManager->trajectory_pos_struct.coeff_1 = rx_msg->coeff_1; 
+            dataManager->trajectory_pos_struct.coeff_2 = rx_msg->coeff_2;
+            dataManager->trajectory_pos_struct.coeff_3 = rx_msg->coeff_3;  
+            dataManager->trajectory_pos_struct.coeff_4 = rx_msg->coeff_4; 
+            dataManager->trajectory_pos_struct.coeff_5 = rx_msg->coeff_5; 
+            dataManager->trajectory_pos_struct.coeff_6 = rx_msg->coeff_6; 
+            dataManager->trajectory_pos_struct.duration = rx_msg->duration; 
+         
+            break;
+        }
+        case MsgTrajectoryPositionTXType: 
+        {
+            dataManager->trajectory_postx_struct.type     = MsgTrajectoryPositionTXType; 
+            dataManager->trajectory_postx_struct.coeff_1  = dataManager->trajectory_pos_struct.coeff_1;
+            dataManager->trajectory_postx_struct.coeff_2  = dataManager->trajectory_pos_struct.coeff_2;
+            dataManager->trajectory_postx_struct.coeff_3  = dataManager->trajectory_pos_struct.coeff_3;
+            dataManager->trajectory_postx_struct.coeff_4  = dataManager->trajectory_pos_struct.coeff_4;
+            dataManager->trajectory_postx_struct.coeff_5  = dataManager->trajectory_pos_struct.coeff_5;
+            dataManager->trajectory_postx_struct.coeff_6  = dataManager->trajectory_pos_struct.coeff_6;
+            dataManager->trajectory_postx_struct.duration = dataManager->trajectory_pos_struct.duration;
+            
+            wifi_send((void*)&(dataManager->trajectory_postx_struct),sizeof(dataManager->trajectory_postx_struct));
+
+            break;
+        }
+
+        case MsgTrajectoryVelocityType:
+        {
+           MsgTrajectoryVelocity *rx_msg = (MsgTrajectoryVelocity*)(rev_buf); 
+           dataManager->trajectory_vel_struct.type    = MsgTrajectoryVelocityType; 
+           dataManager->trajectory_vel_struct.face_id = rx_msg->face_id; 
+           dataManager->trajectory_vel_struct.cmd     = rx_msg->cmd; 
+           dataManager->trajectory_vel_struct.coeff_1 = rx_msg->coeff_1; 
+           dataManager->trajectory_vel_struct.coeff_2 = rx_msg ->coeff_2; 
+
+           break;
+        }
+    
+        case MsgTrajectoryVelocityTXType:
+        {
+            dataManager->trajectory_veltx_struct.type = MsgTrajectoryVelocityTXType; 
+            dataManager->trajectory_veltx_struct.coeff_1 = dataManager->trajectory_vel_struct.coeff_1;
+            dataManager->trajectory_veltx_struct.coeff_2 = dataManager->trajectory_vel_struct.coeff_2; 
+            wifi_send((void*)&(dataManager->trajectory_veltx_struct),sizeof(dataManager->trajectory_veltx_struct)); 
+            break;
+        }
+
+        case MsgTorqueType: 
+        {   
+            MsgTorque *rx_msg = (MsgTorque*)(rev_buf); 
+
+            dataManager->torque_struct.type      = MsgTorqueType;
+            dataManager->torque_struct.DoF       = rx_msg->DoF;
+            dataManager->torque_struct.direction = rx_msg->direction;
+            dataManager->torque_struct.speed     = rx_msg->speed;
+            wifi_send((void*)&(dataManager->torque_struct),sizeof(dataManager->torque_struct));
+            break;
+        }
+       
+        default:  //Error can't find message type 
+            // maybe have a certain led flashing 
+            char msg[] = "Error!";
+            char* msg_buf = msg; 
+            wifi_send(msg_buf,sizeof(msg));
+            break; 
+
+    }
+
+}
+// void magnet_handler(DATA_MANAGER_t* data_manager)
+// {
+//     DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager;
+//     switch(dataManager->magnet_struct.face)
+//     {
+//         case LEFT_FACE:
+//             mBusWriteNoAdd(LEFT_FACE_I2C_ADDRESS << 1, magnet_struct.state, 1); // cant this just be the state ?
+//             break;
+
+//         case RIGHT_FACE:
+//             mBusWriteNoAdd(RIGHT_FACE_I2C_ADDRESS << 1, dataManager->magnet_struct.state, 1);
+//             break;
+
+//         case TOP_FACE:
+//             mBusWriteNoAdd(TOP_FACE_I2C_ADDRESS << 1, dataManager->magnet_struct.state, 1);
+//             break;
+
+//         case BOTTOM_FACE:
+//             WriteNoAdd(BOTTOM_FACE_I2C_ADDRESS << 1, dataManager->magnet_struct.state, 1);
+//             break;
+//     }
+
+
+//     return; 
+// }
+// void cmd_handler(DATA_MANAGER_t *data_manager)
+// {
+//     DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager;
+//     return; 
+// }
+// void velocity_handler(DATA_MANAGER_t *data_manager)
+// {
+//     DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager;
+//     return; 
+// }
+// void leftDOF_handler(DATA_MANAGER_t *data_manager)
+// {
+//     DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager;
+//     return; 
+// }
+// void rightDOF_handler(DATA_MANAGER_t *data_manager)
+// {
+//     DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager;
+//     return; 
+// }

@@ -1,0 +1,100 @@
+#usage	"Renumber parts by page.\n"
+		"Runs in schematic editor only, but keep board editor open to keep consistency.\n"
+		"This scripts will rename all parts to match the format partsuffix+pagenumber+2 digit partindex, "
+		"where partindex starts from 00. This format makes it easy to track parts from pcb to schematic.\n"
+		"If a part has several symbols over several pages, the first occurence in the sheets() loop member "
+		"will be used for pagenumber.\n\n"
+		"Special cases:\n"
+		"If a parts name contains a '_', the string after and including the first '_' will be kept.\n\n"
+		"Developed on Eagle 5.5.0, April 2009 by Morten Leikvoll\n"
+
+if(schematic) schematic(Sch)
+{
+	string commands[];
+	string newnames[];
+	int cmdcnt;
+	string partsinsheet[];
+	string partsinsheetsuf[];
+	int partsinsheetpage[];
+	int index[];
+	string tmpstr;
+	int x;
+
+//	sprintf(commands[cmdcnt++],"#changing names to avoid overlap");
+
+	int numparts=0;
+	Sch.sheets(Sht)
+	{
+		sprintf(commands[cmdcnt++],"EDIT .s%d;",Sht.number);
+		Sht.parts(P)
+		{			for(x=0;x<numparts;x++)
+			{
+				if(P.name==partsinsheet[x]) break;
+			}
+			if(x!=numparts) continue;
+			sprintf(commands[cmdcnt++],"NAME '%s' 'old_%s';",P.name,P.name);
+
+			partsinsheet[numparts]=P.name;
+			x=strstr(P.name,"_");
+			if(x<0)	partsinsheetsuf[numparts]="";
+			else partsinsheetsuf[numparts]=strsub(P.name,x);
+			partsinsheetpage[numparts]=Sht.number;
+			if(P.device.prefix=="") sprintf(newnames[numparts],"U$%d",Sht.number);
+			else sprintf(newnames[numparts],"%s%d",P.device.prefix,Sht.number);
+			numparts++;
+		}
+	}
+	sort(numparts,index,newnames,partsinsheet,partsinsheetsuf,partsinsheetpage);
+
+	int lastpage=-1;
+	int localindex=0;
+//	sprintf(commands[cmdcnt++],"#new names");
+	
+	for(x=0;x<numparts;x++)
+	{
+		if(lastpage!=partsinsheetpage[index[x]])
+		{
+			localindex=0;
+			lastpage=partsinsheetpage[index[x]];
+			sprintf(commands[cmdcnt++],"EDIT .s%d;",lastpage);
+		}
+		sprintf(commands[cmdcnt++],"NAME 'old_%s' '%s%02d%s';",partsinsheet[index[x]],newnames[index[x]],localindex,partsinsheetsuf[index[x]]);
+		localindex++;
+	}
+
+	int selected=0;
+	string fnam;
+	int dlgstat=dlgDialog("Select pages to scan")
+	{
+		sprintf(tmpstr,"Check rename list:(%d parts)",numparts);
+		dlgLabel(tmpstr);
+		dlgListBox(commands, selected);
+		dlgHBoxLayout
+		{
+			dlgPushButton("+Cancel") dlgReject(0);
+			dlgPushButton("Save")
+			{	
+				fnam=dlgFileSave("Save as:","rename.scr");
+				if(fnam!="") dlgAccept(1);
+			};
+			dlgPushButton("Run") dlgAccept(2);
+		}
+	};
+	tmpstr="\n";
+	for(x=0;x<cmdcnt;x++) tmpstr+=commands[x]+"\n";
+
+	if(dlgstat==1) output(fnam)
+	{
+		printf(tmpstr);
+	}
+	if(dlgstat==2) exit(tmpstr);
+	exit(EXIT_SUCCESS);
+}
+else
+{
+	dlgDialog("Problem")
+	{
+		dlgLabel("This ulp only runs under schematic editor");
+		dlgPushButton("+OK") dlgAccept();
+	};
+}

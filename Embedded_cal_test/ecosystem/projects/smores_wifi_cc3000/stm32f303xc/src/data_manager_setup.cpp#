@@ -1,0 +1,406 @@
+#include "smores_setup.h"
+#include "wifi.h"
+
+void dataManagerInit(DATA_MANAGER_t* data_manager)
+{
+
+	DATA_MANAGER_t *dataManager = (DATA_MANAGER_t*) data_manager; 
+
+	 char slave_cmd;
+
+    //  ** power on flag ** //
+    // initial values are 1 to indicate the module is on
+
+    bool power_on_flag = 1;
+    bool counter_left_power_on = 1;
+    bool counter_right_power_on = 1;
+    bool counter_pan_power_on = 1;
+    bool counter_tilt_power_on = 1;
+    
+    
+    // ** torque control flag ** //
+    // initial values are 0 meaning OFF, 1 means turning on torque control mode
+
+    bool torque_flag_left = 0;
+    bool torque_flag_right = 0;
+    bool torque_flag_pan_tilt = 0;
+    
+    // feecback control init part
+
+// motor declaration and initialization
+
+
+    right_pan_tilt_motor.GPIO_Direction_GPIOx = GPIOB;
+    right_pan_tilt_motor.GPIO_Direction_Pin = GPIO_Pin_2;
+    right_pan_tilt_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOB;
+    right_pan_tilt_motor.GPIO_PWM_GPIOx = GPIOA;
+    right_pan_tilt_motor.GPIO_PWM_Pin = GPIO_Pin_8;
+    right_pan_tilt_motor.GPIO_PWM_PinSource = GPIO_PinSource8;
+    right_pan_tilt_motor.GPIO_PWM_AF = GPIO_AF_6;
+    right_pan_tilt_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOA;
+    right_pan_tilt_motor.TIMx = TIM1;
+    right_pan_tilt_motor.TIMx_Channel = TIM_Channel_1;
+    right_pan_tilt_motor.TIMx_RCC = RCC_APB2Periph_TIM1;
+    right_pan_tilt_motor.TIMx_Mode = TIM_OCMode_PWM1;
+    right_pan_tilt_motor.direction = Bit_RESET;
+    right_pan_tilt_motor.speed = 0;
+    
+    Motor_Init(right_pan_tilt_motor);
+    
+    left_pan_tilt_motor.GPIO_Direction_GPIOx = GPIOB;
+    left_pan_tilt_motor.GPIO_Direction_Pin = GPIO_Pin_15;
+    left_pan_tilt_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOB;
+    left_pan_tilt_motor.GPIO_PWM_GPIOx = GPIOB;
+    left_pan_tilt_motor.GPIO_PWM_Pin = GPIO_Pin_14;
+    left_pan_tilt_motor.GPIO_PWM_PinSource = GPIO_PinSource14;
+    left_pan_tilt_motor.GPIO_PWM_AF = GPIO_AF_1;
+    left_pan_tilt_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOB;
+    left_pan_tilt_motor.TIMx = TIM15;
+    left_pan_tilt_motor.TIMx_Channel = TIM_Channel_1;
+    left_pan_tilt_motor.TIMx_RCC = RCC_APB2Periph_TIM15;
+    left_pan_tilt_motor.TIMx_Mode = TIM_OCMode_PWM1;
+    left_pan_tilt_motor.direction = Bit_RESET;
+    left_pan_tilt_motor.speed = 0;
+    
+    Motor_Init(left_pan_tilt_motor);
+
+    right_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
+    right_wheel_motor.GPIO_Direction_Pin = GPIO_Pin_10;
+    right_wheel_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOA;
+    right_wheel_motor.GPIO_PWM_GPIOx = GPIOA;
+    right_wheel_motor.GPIO_PWM_Pin = GPIO_Pin_9;
+    right_wheel_motor.GPIO_PWM_PinSource = GPIO_PinSource9;
+    right_wheel_motor.GPIO_PWM_AF = GPIO_AF_6;
+    right_wheel_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOA;
+    right_wheel_motor.TIMx = TIM1;
+    right_wheel_motor.TIMx_Channel = TIM_Channel_2;
+    right_wheel_motor.TIMx_RCC = RCC_APB2Periph_TIM1;
+    right_wheel_motor.TIMx_Mode = TIM_OCMode_PWM1;
+    right_wheel_motor.direction = Bit_RESET;
+    right_wheel_motor.speed = 0;
+
+    Motor_Init(right_wheel_motor);
+
+    left_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
+    left_wheel_motor.GPIO_Direction_Pin = GPIO_Pin_0;
+    left_wheel_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOA;
+    left_wheel_motor.GPIO_PWM_GPIOx = GPIOA;
+    left_wheel_motor.GPIO_PWM_Pin = GPIO_Pin_1;
+    left_wheel_motor.GPIO_PWM_PinSource = GPIO_PinSource1;
+    left_wheel_motor.GPIO_PWM_AF = GPIO_AF_1;
+    left_wheel_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOA;
+    left_wheel_motor.TIMx = TIM2;
+    left_wheel_motor.TIMx_Channel = TIM_Channel_2;
+    left_wheel_motor.TIMx_RCC = RCC_APB1Periph_TIM2;
+    left_wheel_motor.TIMx_Mode = TIM_OCMode_PWM1;
+    left_wheel_motor.direction = Bit_RESET;
+    left_wheel_motor.speed = 0;
+
+    Motor_Init(left_wheel_motor);
+
+// controller initialization
+
+    // min and max duty cycle of the pwm signal for motors
+
+    int8_t motor_cmd_min = -50;
+    uint8_t motor_cmd_max = 50;
+
+    // min and max position value, -32767 is -180 degree and 32767 is 180 degree
+
+    float min_pos = -32767;
+    float max_pos = 32767;
+
+    // controller for left wheel
+
+    float Kp = 0.018, Ki = 0, Kd = 0.0002;
+    PID_Controller left_wheel_pid_controller(Kp, Ki, Kd, motor_cmd_min, motor_cmd_max);
+    Wheel_Controller_OneMotor left_wheel_control(&left_wheel_pid_controller, left_wheel_motor);
+
+    // left wheel position control trajectory initialization
+
+    float coeff_left[6] = {0,0,0,0,0,0};
+    float duration_left = 0;
+    Polynomial p_left(coeff_left, 6);
+    float startTime_left = 0;
+    float endTime_left = 0;
+    uint16_t sectionNum_left = 500;
+    Trajectory trajectory_left(startTime_left, endTime_left, sectionNum_left, &p_left);
+
+    // left wheel speed control trajectory initialization
+
+    float coeff_speed_left[2] = {0,0};
+    Polynomial p_speed_left(coeff_speed_left, 2);
+    uint16_t positionNum_left = 164;
+    Trajectory trajectory_speed_left(positionNum_left, min_pos, max_pos, &p_speed_left);
+    trajectory_speed_left.GeneratePositionVelocityTrajectory(path_speed_left, &velocity_speed_left);
+    update_times_speed_left = positionNum_left;
+
+    // state goal for left wheel controller initialization
+
+    left_wheel_stateGoal.Position = 0;
+    left_wheel_stateGoal.Speed = 0;
+    left_wheel_control.setStateGoal(left_wheel_stateGoal);
+
+    // current state for left wheel controller declaration
+    PID_State left_wheel_currentState;
+    // left face IIC address and state data feedback
+
+    char slave_addr_left = 0x14;
+    uint8_t data_left[7] = {0,0,0,0,0,0,0};
+
+    // feedback data for left wheel
+    int16_t current_position_left = 0;
+    int32_t current_velocity_left = 0;
+    int8_t left_wheel_cmd = 0;
+
+    // controller for right wheel
+
+    PID_Controller right_wheel_pid_controller(Kp, Ki, Kd, motor_cmd_min, motor_cmd_max);
+    Wheel_Controller_OneMotor right_wheel_control(&right_wheel_pid_controller, right_wheel_motor);
+
+    // right wheel position control trajectory initialization
+
+    float coeff_right[6] = {0,0,0,0,0,0};
+    float duration_right = 0;
+    Polynomial p_right(coeff_right, 6);
+    float startTime_right = 0;
+    float endTime_right = 0;
+    uint16_t sectionNum_right = 500;
+    Trajectory trajectory_right(startTime_right, endTime_right, sectionNum_right, &p_right);
+
+    // right wheel speed control trajecotory initialization
+
+    float coeff_speed_right[2] = {0,0};
+    Polynomial p_speed_right(coeff_speed_right, 2);
+    uint16_t positionNum_right = 164;
+    Trajectory trajectory_speed_right(positionNum_right, min_pos, max_pos, &p_speed_right);
+    trajectory_speed_right.GeneratePositionVelocityTrajectory(path_speed_right, &velocity_speed_right);
+    update_times_speed_right = positionNum_right;
+
+    // state goal for right wheel controller initialization
+    right_wheel_stateGoal.Position = 0;
+    right_wheel_stateGoal.Speed = 0;
+    right_wheel_control.setStateGoal(right_wheel_stateGoal);
+
+    // current state for right wheel controller declaration
+    PID_State right_wheel_currentState;
+    // right face IIC address and state data feedback
+
+    char slave_addr_right = 0x18;
+    uint8_t data_right[7] = {0,0,0,0,0,0,0};
+
+    // feedback data for right wheel
+    int16_t current_position_right = 0;
+    int32_t current_velocity_right = 0;
+    int8_t right_wheel_cmd = 0;
+
+// controller for pan wheel and tilt DoF
+    float Kd_pan = 0.00011;
+    float Kd_tilt = 0.00011;
+    PID_Controller wheel_pid_controller_pan(Kp, Ki, Kd_pan, motor_cmd_min, motor_cmd_max);
+    PID_Controller wheel_pid_controller_tilt(Kp, Ki, Kd_tilt, motor_cmd_min, motor_cmd_max);
+    Wheel_Controller_Pan_Tilt wheel_control_pan_tilt(&wheel_pid_controller_pan, &wheel_pid_controller_tilt, left_pan_tilt_motor, right_pan_tilt_motor);
+
+    // pan wheel position control trajectory initialization
+
+    float coeff_pan[6] = {0,0,0,0,0,0};
+    float duration_pan = 0;
+    Polynomial p_pan(coeff_pan, 6);
+    float startTime_pan = 0;
+    float endTime_pan = 0;
+    uint16_t sectionNum_pan = 500;
+    Trajectory trajectory_pan(startTime_pan, endTime_pan, sectionNum_pan, &p_pan);
+
+    // pan wheel speed control trajectory initialization
+
+    float coeff_speed_pan[2] = {0,0};
+    Polynomial p_speed_pan(coeff_speed_pan, 2);
+    uint16_t positionNum_pan = 164;
+    Trajectory trajectory_speed_pan(positionNum_pan, min_pos, max_pos, &p_speed_pan);
+    trajectory_speed_pan.GeneratePositionVelocityTrajectory(path_speed_pan, &velocity_speed_pan);
+    update_times_speed_pan = positionNum_pan;
+
+    // state goal for pan wheel initialization
+
+    pan_wheel_stateGoal.Position = 0;
+    pan_wheel_stateGoal.Speed = 0;
+
+    // current state for pan wheel declaration
+    PID_State pan_wheel_currentState;
+    // top face IIC address and state data feedback
+
+    char slave_addr_pan = 0x1A;
+    uint8_t data_pan[7] = {0,0,0,0,0,0,0};
+
+    // feedback data for pan wheel
+
+    int16_t current_position_pan = 0;
+    int32_t current_velocity_pan = 0;
+    int8_t left_motor_cmd = 0;
+    int8_t right_motor_cmd = 0;
+
+    // tilt DoF position control trajectory initialization
+
+    float coeff_tilt[6] = {0,0,0,0,0,0};
+    float duration_tilt = 0;
+    Polynomial p_tilt(coeff_tilt, 6);
+    float startTime_tilt = 0;
+    float endTime_tilt = 0;
+    uint16_t sectionNum_tilt = 500;
+    Trajectory trajectory_tilt(startTime_tilt, endTime_tilt, sectionNum_tilt, &p_tilt);
+
+    // state goal for tilt DoF initialization
+
+    tilt_wheel_stateGoal.Position = 0;
+    tilt_wheel_stateGoal.Speed = 0;
+
+    // initialize the controller for pan wheel and tilt DoF
+
+    wheel_control_pan_tilt.setStateGoal(pan_wheel_stateGoal, tilt_wheel_stateGoal);
+
+    // current state for tilt DoF declaration
+    PID_State tilt_wheel_currentState;
+    // bottom face IIC address and state data feedback
+
+    char slave_addr_tilt = 0x16;
+    uint8_t data_tilt[7] = {0,0,0,0,0,0,0};
+
+    // feedback data for tilt wheel
+    int16_t current_position_tilt = 0;
+    int32_t current_velocity_tilt = 0;
+    
+
+
+// initialize all start_flag to be 0 to shut down state goal updating until it gets feedback data
+    start_flag_left = 0;
+    start_flag_right = 0;
+    start_flag_pan = 0;
+    start_flag_tilt = 0;
+    pan_ready_flag = 0;
+    tilt_ready_flag = 0;
+    char cmd;
+
+    dataManager->wheel_motor[0] = &left_wheel_motor;
+    dataManager->wheel_motor[1] = &right_wheel_motor;
+    dataManager->wheel_motor[2] = &left_pan_tilt_motor; 
+    dataManager->wheel_motor[3] = &right_pan_tilt_motor; 
+
+    dataManager->wheel_control[0] = &left_wheel_control;
+    dataManager->wheel_control[1] = &right_wheel_control; 
+    dataManager->wheel_control_pt =  &wheel_control_pan_tilt; 
+
+    dataManager->wheel_currentState[0] = &left_wheel_currentState; 
+    dataManager->wheel_currentState[1] = &right_wheel_currentState; 
+    dataManager->wheel_currentState[2] = &tilt_wheel_currentState; 
+    dataManager->wheel_currentState[3] = &pan_wheel_currentState; 
+
+    dataManager->wheel_stateGoal[0] = &left_wheel_stateGoal;
+    dataManager->wheel_stateGoal[1] = &right_wheel_stateGoal;
+    dataManager->wheel_stateGoal[2] = &tilt_wheel_stateGoal; 
+    dataManager->wheel_stateGoal[3] = &pan_wheel_stateGoal;
+   
+    
+    dataManager->poly[0] = &p_left; 
+    dataManager->poly[1] = &p_right; 
+    dataManager->poly[2] = &p_tilt;
+    dataManager->poly[3] = &p_pan; 
+
+    dataManager->poly_speed[0] = &p_speed_left; 
+    dataManager->poly_speed[1] = &p_speed_right;
+    dataManager->poly_speed[2] = &p_speed_pan;
+
+    dataManager->traj[0] = &trajectory_left;
+    dataManager->traj[1] = &trajectory_right; 
+    dataManager->traj[2] = &trajectory_tilt; 
+    dataManager->traj[3] = &trajectory_pan;
+
+    dataManager->traj_speed[0] = &trajectory_speed_left; 
+    dataManager->traj_speed[1] = &trajectory_speed_right; 
+    dataManager->traj_speed[2] = &trajectory_speed_pan; 
+
+
+
+//****global vars arrays****// 
+    dataManager->current_position[0] = current_position_left;
+    dataManager->current_position[1] = current_position_right; 
+    dataManager->current_position[2] = current_position_tilt;
+    dataManager->current_position[3] = current_position_pan; 
+
+    dataManager->current_velocity[0] = current_velocity_left; 
+    dataManager->current_velocity[1] = current_velocity_right;
+    dataManager->current_velocity[2] = current_velocity_tilt; 
+    dataManager->current_velocity[3] = current_velocity_pan; 
+
+    dataManager->motor_cmd[0] = left_wheel_cmd; 
+    dataManager->motor_cmd[1] = right_wheel_cmd; 
+    dataManager->motor_cmd[2] = left_motor_cmd;
+    dataManager->motor_cmd[3] = right_motor_cmd; // check the left motor == pan 
+
+    dataManager->path_pos[0] = path_left; 
+    dataManager->path_pos[1] = path_right; 
+    dataManager->path_pos[2] = path_tilt; 
+    dataManager->path_pos[3] = path_pan; 
+
+    dataManager->velocity_pos[0] = velocity_left; 
+    dataManager->velocity_pos[1] = velocity_right; 
+    dataManager->velocity_pos[2] = velocity_tilt; 
+    dataManager->velocity_pos[3] = velocity_pan; 
+
+    dataManager->duration[0] = duration_left;
+    dataManager->duration[1] = duration_right;
+    dataManager->duration[2] = duration_tilt;
+    dataManager->duration[3] = duration_pan; 
+
+    dataManager->startTime[0] = startTime_left;
+    dataManager->startTime[1] = startTime_right; 
+    dataManager->startTime[2] = startTime_tilt; 
+    dataManager->startTime[3] = startTime_pan; 
+
+    dataManager->timer_counter[0] = timer_counter_left; 
+    dataManager->timer_counter[1] = timer_counter_right; 
+    dataManager->timer_counter[2] = timer_counter_tilt; 
+    dataManager->timer_counter[3] = timer_counter_pan; 
+
+    dataManager->endTime[0] = endTime_left;
+    dataManager->endTime[1] = endTime_right; 
+    dataManager->endTime[2] = endTime_tilt;
+    dataManager->endTime[3] = endTime_pan;
+
+    dataManager->sectionNum[0] = sectionNum_left;
+    dataManager->sectionNum[1] = sectionNum_right;
+    dataManager->sectionNum[2] = sectionNum_tilt; 
+    dataManager->sectionNum[3] = sectionNum_pan; 
+
+    dataManager->update_times[0] = update_times_left;
+    dataManager->update_times[1] = update_times_right;
+    dataManager->update_times[2] = update_times_tilt; 
+    dataManager->update_times[3] = update_times_pan; 
+
+    dataManager->init_flag[0] = init_flag_left;
+    dataManager->init_flag[1] = init_flag_right;
+    dataManager->init_flag[2] = init_flag_tilt;
+    dataManager->init_flag[3] = init_flag_pan; 
+
+    dataManager->power_on_flag = power_on_flag; 
+    dataManager->counter_power_on[0] = counter_left_power_on; 
+    dataManager->counter_power_on[1] = counter_right_power_on; 
+    dataManager->counter_power_on[2] = counter_tilt_power_on; 
+    dataManager->counter_power_on[3] = counter_pan_power_on; 
+
+    dataManager->index_position[0] = index_position_left;
+    dataManager->index_position[1] = index_position_right; 
+    dataManager->index_position[2] = index_position_tilt; 
+    dataManager->index_position[3] = index_position_pan; 
+
+    dataManager->global_flag[0] = global_flag_left;
+    dataManager->global_flag[1] = global_flag_right; 
+    dataManager->global_flag[2] = global_flag_tilt; 
+    dataManager->global_flag[3] = global_flag_pan; 
+
+    dataManager->torque_flag[0] = torque_flag_left;
+    dataManager->torque_flag[1] = torque_flag_right; 
+    dataManager->torque_flag[2] = torque_flag_pan_tilt;
+    
+
+
+}

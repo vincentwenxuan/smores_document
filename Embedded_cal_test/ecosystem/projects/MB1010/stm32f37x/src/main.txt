@@ -1,0 +1,344 @@
+/*
+ * Cedric Destin
+ * Date 6/12
+ * 
+ */
+#include "stm32f37x.h"
+#include "mGeneral.h"
+#include "peripherals.h"
+#include "stdio.h"
+#include "types.h"
+
+/// Include your custom headers here
+#include "usb_interface.h"
+#include "types.h"
+/// Initialize variables here
+// main function
+int main(void){
+  
+  InitPeripherals();
+  USART_InitTypeDef USART_InitStructure;
+  GPIO_InitTypeDef GPIO_InitStructure; 
+  
+  /* Enable GPIOA clock */
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA , ENABLE);
+  
+  /* Enable USART2 APB clock */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+  
+  
+  GPIO_DeInit(GPIOA);
+
+    /* Connect pin to Periph */
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_7);    
+  
+  /* Configure pins as AF pushpull */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOA, &GPIO_InitStructure); 
+  
+  InitPeripherals();
+   
+  /* USARTx configured as follow:
+  - BaudRate = 9600 baud  
+  - Word Length = 8 Bits
+  - Stop Bit = 1 Stop Bit
+  - Parity = No Parity
+  - Hardware flow control disabled (RTS and CTS signals)
+  - Receive and transmit enabled
+  */
+  
+  USART_DeInit(USART2);
+  USART_InitStructure.USART_BaudRate = 9600;
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  USART_InitStructure.USART_Parity = USART_Parity_No;
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStructure.USART_Mode = USART_Mode_Rx;
+  USART_Init(USART2, &USART_InitStructure);
+  
+    /* USART enable */
+  USART_Cmd(USART2, ENABLE);
+  
+  /* Configure the AutoBaudRate method */
+  USART_AutoBaudRateConfig(USART2, USART_AutoBaudRate_StartBit);
+  
+  /* Enable AutoBaudRate feature */
+  USART_AutoBaudRateCmd(USART2, ENABLE);
+  
+  /* Wait until Receive enable acknowledge flag is set */
+  while(USART_GetFlagStatus(USART2, USART_FLAG_REACK) == RESET){
+    mRedON;
+    printf("\r Getting flag status receive \n");
+    mWaitms(10);
+  }  
+  mRedOFF;
+//   /* Wait until Transmit enable acknowledge flag is set */  
+//   while(USART_GetFlagStatus(USART2, USART_FLAG_TEACK) == RESET){
+//     mRedON;
+//     printf("\r Getting flag status transmit \n");
+//   }  
+//   mRedOFF;
+  /* Loop until the end of Autobaudrate phase */
+  while(USART_GetFlagStatus(USART2, USART_FLAG_ABRF) == RESET){
+    mRedON;
+    printf("\r Getting flag status auto- baudrate \n");
+    mWaitms(10);
+  }
+  mRedOFF;
+  if (USART_GetFlagStatus(USART2, USART_FLAG_ABRE) != RESET){
+    /* Turn on LED3 */
+    mRedON;
+    printf("Checking ABR flags again");
+    mWaitms(10);
+  }
+  else{
+    mRedOFF;
+    printf("ABRF");
+    /* Turn on LED2 */
+    mRedON;
+    /* Wait until RXNE flag is set */
+    while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET){
+      printf("Getting status for RX flag");
+      mRedON;
+      mWaitms(10);
+    }
+    mRedOFF;
+    uint8_t data = USART_ReceiveData(USART2); 
+    /* USART Disable */
+    USART_Cmd(USART2, DISABLE);
+  }
+  /* USART Disable */
+  //USART_Cmd(USART2, DISABLE);
+  while(1){
+    uint8_t data = USART_ReceiveData(USART2);
+    mRedOFF;
+    printf("data = %X\r\n", data);
+    mWaitms(10);
+    mGreenON;
+  }
+  return(0);
+}
+
+/*-----------------------------------------------------------------------*/
+/*
+ * Cedric Destin
+ * Date 6/12
+ * 
+ */
+#include "stm32f37x.h"
+#include "mGeneral.h"
+#include "peripherals.h"
+#include "stdio.h"
+#include "types.h"
+/// Include your custom headers here
+#include "usb_interface.h"
+#include "types.h"
+/// Initialize variables here
+static void USART_Config(void);
+USART_InitTypeDef USART_InitStructure;
+GPIO_InitTypeDef GPIO_InitStructure; 
+// main function
+int main(void){
+
+  InitPeripherals();
+  
+  /* USART configuration to use auto baudrate capability */
+  USART_Config();
+  uint16_t data = 0b11100010;
+  USART_SendData(USART2, data); 
+  
+  /* If AutoBaudBate error occurred */
+//   if (USART_GetFlagStatus(USART2, USART_FLAG_ABRE) != RESET){
+//     /* Turn on LED3 */
+//     mRedON;
+//   }
+//   else{
+//     /* Turn on LED2 */
+//     mRedOFF;
+//     mGreenON;
+//     /* Wait until RXNE flag is set */
+//     while(USART_GetFlagStatus(USART2, USART_FLAG_RXNE) == RESET){
+//       mRedON;
+//       mGreenOFF;
+//       printf("...");
+//     }
+//     
+//     /* Wait until TXE flag is set */    
+//     while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET){
+//       mRedON;
+//       mGreenOFF;
+//       printf("...");
+//     }
+//     uint16_t data = 1;
+//     /* Send received character */
+//     USART_SendData(USART2, data); 
+//     
+//     /* clear the TE bit (if a transmission is on going or a data is in the TDR, it will be sent before
+//     efectivelly disabling the transmission) */
+//     USART_DirectionModeCmd(USART2, USART_Mode_Tx, DISABLE);
+//     
+//     /* Check the Transfer Complete Flag */
+//     while (USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET){
+//       mRedON;
+//       mGreenOFF;
+//       printf("...");
+//     }
+//   }
+//   /* USART Disable */
+//   USART_Cmd(USART2, DISABLE);
+
+
+    
+  while(1){
+    mRedOFF;
+    mBlueOFF;
+    mYellowOFF;
+    mGreenON;
+//     printf("OK");
+//     uint16_t data = 0b11001100;
+//     /* Send received character */
+//     USART_SendData(USART2, data); 
+  }
+}
+static void USART_Config(void){ 
+  mYellowON;
+  mWaitms(1000);
+  /* Enable GPIOA clock */
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA , ENABLE);
+  
+  /* Enable USART2 APB / AHB clock */
+  RCC_AHBPeriphClockCmd(RCC_APB1Periph_USART2, ENABLE); 
+  //RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+  
+  /* USART2 Pins configuration **************************************************/
+  GPIO_DeInit(GPIOA); // Denitialize port A to its initial value
+  
+  /* Connect pin to Periph */
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_7);    
+  //GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_7); 
+  
+  /* Configure pins as AF pushpull */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 /*| GPIO_Pin_3*/;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOA, &GPIO_InitStructure); 
+  
+  printf("Pin set as AF");
+  
+  InitPeripherals();
+  
+  mGreenON;
+  mBlueON;
+  mWaitms(100);
+  mGreenOFF;
+   
+  /* USARTx configured as follow:
+  - BaudRate = 9600 baud  
+  - Word Length = 8 Bits
+  - Stop Bit = 1 Stop Bit
+  - Parity = No Parity
+  - Hardware flow control disabled (RTS and CTS signals)
+  - Receive and transmit enabled
+  */
+  
+  //USART_DeInit(USART2);
+  USART_InitStructure.USART_BaudRate = 9600;
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  USART_InitStructure.USART_Parity = USART_Parity_No;
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStructure.USART_Mode = /*USART_Mode_Rx* |*/ USART_Mode_Tx;
+  USART_Init(USART2, &USART_InitStructure);
+  
+  printf("USART set as 9600");
+  
+    /* USART enable */
+  USART_Cmd(USART2, ENABLE);
+  
+  /* Wait until Receive enable acknowledge flag is set */
+//   while(USART_GetFlagStatus(USART2, USART_FLAG_REACK) == RESET){
+//     mRedON;
+//     mBlueOFF;
+//     mGreenOFF;
+//     printf("\rReseting the REACK...\n");
+//   }  
+  
+  /* Wait until Transmit enable acknowledge flag is set */  
+  while(USART_GetFlagStatus(USART2, USART_FLAG_TEACK) == RESET){
+    mRedON;
+    mGreenOFF;
+    mBlueOFF;
+    mWaitms(10);
+    mRedOFF;
+    mWaitms(10);
+    printf("\rReseting the TEACK...\n");
+  }  
+}
+/*******************************************************************************************************/
+/*
+ * Cedric Destin
+ * Date 6/12
+ * 
+ */
+#include "stm32f37x.h"
+#include "mGeneral.h"
+#include "peripherals.h"
+#include "stdio.h"
+#include "types.h"
+/// Include your custom headers here
+#include "usb_interface.h"
+#include "types.h"
+/// Initialize variables here
+USART_InitTypeDef USART_InitStructure;
+GPIO_InitTypeDef GPIO_InitStructure; 
+// main function
+int main(void){
+  
+  uint8_t data = 0xAA;
+
+  InitPeripherals();
+  
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+  
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+  
+  GPIO_PinAFConfig(GPIOA, GPIO_Pin_2, GPIO_AF_7);
+  
+  
+  
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOA, &GPIO_InitStructure); 
+  
+  USART_InitStructure.USART_BaudRate = 9600;
+  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  USART_InitStructure.USART_Parity = USART_Parity_No;
+  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStructure.USART_Mode = USART_Mode_Tx;
+  USART_Init(USART2, &USART_InitStructure);
+  
+  USART_Cmd(USART2, ENABLE);
+  
+  //Usart1Put('A');
+  
+  USART_SendData(USART2, data);
+  
+  while(1){
+    USART_SendData(USART2, data);
+    mRedTOGGLE;
+    mBlueOFF;
+    mYellowOFF;
+    mGreenON;
+    mWaitms(100);
+  }
+}

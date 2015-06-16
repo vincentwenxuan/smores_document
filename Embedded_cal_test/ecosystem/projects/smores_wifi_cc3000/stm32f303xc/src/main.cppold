@@ -1,0 +1,176 @@
+#include "common_peripherals.h"
+#include "system_clock.h"
+// common components 
+#include "common_message_types.h" 
+// common messages
+//#include "usb_interface.h"
+// usb interface
+#include "mBus.h"
+
+// common libraries
+#include "project_message_types.h"
+#include "error_reporting.h"
+#include <string.h> 
+//needed for memset
+
+#include "stm32_cc3000.h"
+#include "CC3000_socket.h"
+
+
+#define   mBUS 1 
+
+#define SEND_DATA 10
+#define M_YELLOW_TOGGLE 20
+#define M_WHITE_TOGGLE  30
+void wifi_send(void* data_to_send, long data_size);
+void wifi_recieve(void);
+
+
+/*Declare global variables*/
+char cc3000_device_name[] = "CC3000";
+
+int main (void){
+	InitPeripherals();
+    
+    debug_setup();
+    cc3000_initialize_ip(100);
+    cc3000_startup_check();
+    
+    udp_socket_communication(); //UDP socket communication
+    
+    mYellowON; mRedON; mGreenON; mWhiteON; mBlueON;
+	DelayMilliseconds(1000);
+    mYellowOFF;mRedOFF;mGreenOFF; mWhiteOFF; mBlueOFF;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Main Loop
+    // while(1) {
+        
+    //     // //Transmit data
+    //     // sendto(desSocket, buf_t_send, buf_t_send_len, 0, (sockaddr*) &des_addr, sizeof(des_addr));
+    //     // DelayMilliseconds(2);	//Delay is needed between send and receive functions
+
+    //     //Receive data
+    //     revLen = recvfrom(revSocket, rev_buf, sizeof(rev_buf), 0, (sockaddr*) &source_addr, &revPacketLen);
+    //     if(revLen>0){
+    //         //debug_write_u32(source_addr.sin_addr.s_addr, 16);
+    //         debug_write_bytes(rev_buf, revLen);
+    //         //motor_test(rev_buf[0]);
+    //         mRedTOGGLE;
+    //         sendto(desSocket, rev_buf, revLen, 0, (sockaddr*) &des_addr, sizeof(des_addr));
+    //         DelayMilliseconds(2);   //Delay is needed between send and receive functions
+    //     }
+        
+    //     //Available function seems to cause lots of overhead, avoid using it if speed is desired
+    //     /*
+    //      if(available(revSocket)==1){
+    //      revLen = recvfrom(revSocket, rev_buf, 10, 0, (sockaddr*)&source_addr, &revPacketLen);
+    //      //debug_write_bytes(rev_buf, revLen);
+    //      motor_test(rev_buf[0]);
+    //      mRedTOGGLE;				
+    //      }
+    //      */
+        
+    //     //Heartbeat
+    //     mBlueTOGGLE;
+    //     DelayMilliseconds(200);
+
+ 
+    // } // while(1)
+    //************************************************************************************************************************************// 
+   
+    while(1)
+    {
+
+        revLen = recvfrom(revSocket, rev_buf, sizeof(rev_buf), 0, (sockaddr*) &source_addr, &revPacketLen);
+            if(revLen>0)
+            {
+               mRedON;
+
+               wifi_recieve(); 
+               //mRedON; 
+            }
+        mBlueTOGGLE;
+        mGreenTOGGLE;
+
+    }
+    return(0);
+}
+
+void wifi_recieve(void)
+{
+    uint8_t  msg_id = rev_buf[0];  
+    switch ( msg_id)
+    {
+        case MsgBrainIpType: 
+        {
+            MsgBrainIp *rx_msg = (MsgBrainIp*)(rev_buf+1); 
+           
+            memset((char *)&des_addr, 0, sizeof(des_addr));
+            des_addr.sin_family       = AF_INET;
+            des_addr.sin_port         = htons(rx_msg->brain_socket);
+            des_addr.sin_addr.s_addr  = rx_msg->brain_ip;
+
+            char status_msg[11] = "sending to"; 
+            char *msg_buf = status_msg; 
+            wifi_send(msg_buf, sizeof(status_msg)); 
+            //sendto(desSocket,msg_buf,sizeof(status_msg),0, (sockaddr*) &new_addr, sizeof(new_addr));
+
+            break;  
+        }
+        case MsgCmdType:
+        {
+            MsgCmd *rx_msg = ((MsgCmd*)(rev_buf+1));
+            wifi_send(rx_msg,sizeof(MsgCmd));
+            //DelayMilliseconds(1);
+            //sendto(desSocket, rx_msg, sizeof(rx_msg), 0, (sockaddr*) &des_addr, sizeof(des_addr));
+            char test_msg[12] = "speed check";
+            //DelayMilliseconds(2);
+            char* msg_buf = test_msg; 
+             wifi_send(msg_buf, sizeof(test_msg));  
+            
+
+            break; 
+        }
+        case MsgMagnetType:
+        { 
+            MsgMagnet *rx_msg = ((MsgMagnet*)(rev_buf+1)); 
+            // buf_t_send = (char*)&rx_msg;
+            wifi_send(rx_msg,sizeof(MsgMagnet)); 
+            break; 
+        }
+        case MsgCurrentStateType: 
+
+            MsgCurrentState tx_msg;
+            tx_msg.type =MsgCurrentStateType; 
+            tx_msg.goal_position = 11;
+            tx_msg.goal_velocity = 25;
+            tx_msg.current_position = 19;
+            tx_msg.current_velocity = 9;
+            tx_msg.motor_cmd = 0;
+            wifi_send((void *)&tx_msg,sizeof(tx_msg)); 
+
+            break; 
+        // case MsgModuleType: 
+        //     break; 
+        default:  //Error can't find message type 
+            // maybe have a certain led flashing 
+            char msg[25] = "Error!";
+            char* msg_buf = msg; 
+            wifi_send(msg_buf,sizeof(msg));
+            break; 
+
+
+    }
+
+}
+
+void wifi_send(void* data_to_send, long data_size )
+{
+
+    sendto(desSocket, data_to_send, data_size, 0, (sockaddr*) &des_addr, sizeof(des_addr));
+
+} 
+
+
+

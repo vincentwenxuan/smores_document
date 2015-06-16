@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "ATtiny1634_USART", "ATtiny1634_USART\ATtiny1634_USART.cproj", "{ABE384F0-CD23-41CC-8ED4-47343705D1BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ABE384F0-CD23-41CC-8ED4-47343705D1BF}.Debug|AVR.ActiveCfg = Debug|AVR
+		{ABE384F0-CD23-41CC-8ED4-47343705D1BF}.Debug|AVR.Build.0 = Debug|AVR
+		{ABE384F0-CD23-41CC-8ED4-47343705D1BF}.Release|AVR.ActiveCfg = Release|AVR
+		{ABE384F0-CD23-41CC-8ED4-47343705D1BF}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

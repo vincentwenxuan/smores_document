@@ -1,0 +1,37 @@
+Summary created by Wireshark  (v1.10.6 from master-1.10)
+
+File: 
+   Name:             /tmp/wireshark_pcapng_wlan0_20150603181214_NTTekb
+   Length:            754000798 bytes
+   Format:            Wireshark/... - pcapng
+   Encapsulation:    Ethernet
+
+
+Time:
+   First packet:    First packet:   
+   Last packet:    Last packet:    
+   Elapsed:    Elapsed: et:    Last packet: ast 
+
+
+Capture:
+   OS: Linux 3.11.0-12-generic
+   Capture application: Dumpcap 1.10.6 (v1.10.6 from master-1.10)
+
+   wlan0:
+      Dropped packets: 5294 (0.056%)
+      Capture filter: none
+      Link type: Ethernet
+      Packet size limit 65535 bytes
+
+Statistics:
+   Packets: 9423845
+   Between first and last packet:100.520 sec
+   Avg. packets/sec: 93750.822
+   Avg packet size: 45.019 bytes
+   Bytes: 424255984
+   Avg bytes/sec: 4220607.109
+   Avg Mbit/sec: 33.765
+
+
+
+

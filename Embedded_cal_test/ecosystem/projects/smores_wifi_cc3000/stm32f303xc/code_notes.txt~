@@ -1,0 +1,6 @@
+Change Magnet state number to the actual i2c address macros (fix this in python) 
+
+Get rid of all these flags 
+
+switch to my wifi sending method use datamanger to access stored structs
+

@@ -1,0 +1,15 @@
+Round, not square
+Mount holes not 90deg from usb (for mounting reasons) (mounting holes at 45deg, usb and motor at ordinal)
+Radio footprint vs atmel gerbers
+Can the Vreg tell us when it's on?  Yes, use the PG pin!  Use micro internal pu.
+Yash sexy button (vreg with enables required)
+Bigger antenna via (or chip antenna)
+Current sensor voltage divider needs 1ks, not 10ks or 1.65 ref voltage (probs 1.65 ref reg) (dac?)
+Should have individual voltage dividers because long wires crossing fets get noise
+Route analog lines from current sensors smartly, no crossing fets or poss differential measurement
+move current sensors and thermistor up so 3.3 doesn't have to go to bottom
+Big ceramic vs tant?
+smaller fets?
+smd usb (DONE)
+cap on reset?
+Thermistor? If board could be smaller, no

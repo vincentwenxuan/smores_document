@@ -1,0 +1,42 @@
+************************************************************************
+Orginal Layout Notes:
+
+--Add large supply cap to motor driver sheet.
+--Eliminate capacitors to balun balanced inputs and add 100 p capacitor to balun unbalanced output, as per reference design from Atmel.
+
+************************************************************************
+After Testing:
+
+Fix:
+
+OK -- flip crystal footprint (upside-down)
+OK -- feed motor controller / LDO enable direct from battery
+OK -- protect gound pad on bottom of motor driver
+-- add vias to SPI lines
+-- add vias to I2C lines
+-- add vias to clock lines
+
+MAV Features:
+
+OK -- shrink board size
+-- reduce board thickness
+NO -- consider 45 degree IC orientations
+OK -- check on 0402 footprint sizes
+OK -- add more LEDs (red, yellow, green, blue, white)
+OK -- swap motor thru holes for pads
+OK -- plan for battery connector
+OK -- add analog / uart pins for sonar sensor
+OK -- add pwm pads to control CX2
+
+Dongle Features:
+
+-- design as single-sided two-layer
+-- add silkscreen labels for output pads on both sides
+-- add vias near output pads on both sides
+-- charge state indicator (or on MAV?)
+-- power indicator
+
+
+-- Power features
+  -- MAV battery removable
+  -- MAV battery easily disconnected (power switch)

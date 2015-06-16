@@ -1,0 +1,13 @@
+V1 > V2
+1. Slave select pin of the ATRF needs to be connected to a microcontroller pin (any GPIO is fine).
+2. Reset and Sleep pins of the ATRF need to be pulled up and down respectively. The reset pin can also be connected to a microcontroller pin if possible, though this is not really needed.
+3. The pull-up resistors on the I2C need to be smaller, I see very slow rise times on the bus with the 10k ones. 1k works fine it seems, though I'm still not sure why we need such a strong pull-up.
+4. Just check the RC timeout on the reset latch. One of the boards has an irritatingly short timeout.
+5. Pull down on the gates of the motor FETs. ??Necessary??
+6. Boot button change to button push hold plus power cycle with switch
+7. Flyback diodes across motors
+8. Test pads on comms lines (and perhaps others?)
+9. Reverse polarity protection
+10. IMU axis
+11. Serial breakout?
+12. EMI supression on USB

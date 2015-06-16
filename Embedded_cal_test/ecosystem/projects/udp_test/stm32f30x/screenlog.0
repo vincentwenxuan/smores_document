@@ -1,0 +1,50 @@
+
+
+END cc3000_setup
+cc3000_get_firmware_version
+major: 0x01
+minor: 0x1A
+Wrong firmware version!
+cc3000_get_mac_address
+MAC Address: 08 00 28 59 92 B2 
+Deleting old connection profiles
+Attempting to connect to Gumsticks connector
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+END cc3000_setup
+cc3000_get_firmware_version
+major: 0x01
+minor: 0x1A
+Wrong firmware version!
+cc3000_get_mac_address
+MAC Address: 08 00 28 59 92 B2 
+Deleting old connection profiles
+Attempting to connect to Gumsticks Modlab
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+Waiting to connect...
+Timed out!
+Started AP/SSID scan
+unknown type: 00
+Waiting to connect...
+Timed out!
+Started AP/SSID scan

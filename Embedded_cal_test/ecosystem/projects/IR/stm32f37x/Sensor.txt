@@ -1,0 +1,67 @@
+Trial 1 Carpet
+Data(x)	Actual(cm)
+2626	12
+1369	24
+760	32
+500	48
+273	60
+Trial 2 Carpet
+Actual(cm)	Data(x)
+6		2930
+12		2650
+18		1760
+24		1290
+30		1000
+36		830
+42		610
+48		440
+54		290
+60		160
+Trial 3 Glass
+Actual(cm)	Experimented(cm)
+40cm		44cm
+60cm		59.98cm
+82cm		87.15cm
+20cm 		24.9cm Min
+Great up to 90cm
+
+Trial 4 Metal
+Actual(cm)	Experimented(cm)
+23		25
+24		26
+29		33
+50		45
+60		58
+80		89
+90		96
+
+Trial 5 Carpet
+Actual(in)	Experiment(cm)
+6		21
+12		25
+18		40
+24		60
+30		77
+36		90
+42		102
+48		115
+54		126
+60		140
+66		150
+72		166
+
+Trial 6 Carpet
+Actual(cm) 	Experimented(cm)
+14.44		22
+30.43		27.4
+45.72		46.24
+60.96		62.9
+76.2		77.8
+91.44		87.2
+106.68		96.1
+121.92		107.2
+137.16		115.9
+152.54		130.5
+167.4		148.8
+182.88		160
+198.12		165

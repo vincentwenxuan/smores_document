@@ -1,0 +1,232 @@
+# This generic Makefile is intended to be invoked through 'include' by a 
+# Makefile in the project directory.  That makefile must define the following:
+#
+# PROJNAME     project name (no spaces)
+# TARGET_IC    choose from {STM32F37X, STM32F303XC}
+
+#------------------------------------------------------------------------------
+
+MAKEFLAGS = -j
+
+ifeq ($(TARGET_IC), STM32F37X)
+	TARGET_SUFFIX = stm32f37x
+	TARGET_FLAGS = -DSTM32F37X
+else ifeq ($(TARGET_IC), STM32F303XC)
+	TARGET_SUFFIX = stm32f30x
+	TARGET_FLAGS = -DSTM32F303xC
+else
+$(error TARGET_IC = $(TARGET_IC) is unknown.)
+endif
+
+PROJECT_CXX_FLAGS ?=
+PROJECT_C_FLAGS ?=
+
+BUILDDIR = obj_$(TARGET_SUFFIX)
+INCDIR    = inc
+SOURCEDIR = src
+
+
+DIR_STM32_C    			= ../../../stm32/c
+DIR_STM32_CPP    		= ../../../stm32/cpp
+DIR_STM32FXXX_C    		= ../../../$(TARGET_SUFFIX)/c
+DIR_STM32FXXX_CPP   		= ../../../$(TARGET_SUFFIX)/cpp
+DIR_COMMON_C				= ../../../common/c
+DIR_COMMON_CPP			= ../../../common/cpp
+ifdef USER_LIB
+	DIR_USER_LIB_C		= $(USER_LIB)/c
+	DIR_USER_LIB_CPP	= $(USER_LIB)/cpp
+endif
+
+
+ARCH    = arm-none-eabi
+CC      = $(ARCH)-gcc
+CXX     = $(ARCH)-g++
+LD      = $(ARCH)-ld
+AS      = $(ARCH)-as
+SZ      = $(ARCH)-size
+OBJCPY  = $(ARCH)-objcopy
+OBJDMP  = $(ARCH)-objdump
+
+LDSCRIPT = $(DIR_STM32FXXX_C)/st/STM32_FLASH.ld
+STARTUP  = $(DIR_STM32FXXX_C)/st/startup_$(TARGET_SUFFIX).s
+
+
+
+
+# compiler includes
+INCLUDES = -Iinc
+
+INCLUDES += -I$(DIR_COMMON_C)/user/inc
+ifdef USER_LIB
+	INCLUDES += -I$(DIR_USER_LIB_C)/inc
+endif
+
+INCLUDES += -I$(DIR_COMMON_CPP)/user/inc
+INCLUDES += -I$(DIR_COMMON_CPP)/$(EIGEN)
+ifdef USER_LIB
+	INCLUDES += -I$(DIR_USER_LIB_CPP)/inc
+endif
+
+INCLUDES += -I$(DIR_STM32_C)/user/inc
+INCLUDES += -I$(DIR_STM32_C)/arm
+INCLUDES += -I$(DIR_STM32_C)/usb/inc
+
+INCLUDES += -I$(DIR_STM32_CPP)/user/inc
+
+INCLUDES += -I$(DIR_STM32FXXX_C)/user/inc
+INCLUDES += -I$(DIR_STM32FXXX_C)/cpal/inc
+INCLUDES += -I$(DIR_STM32FXXX_C)/m4/inc
+INCLUDES += -I$(DIR_STM32FXXX_C)/st/inc
+
+INCLUDES += -I$(DIR_STM32FXXX_CPP)/user/inc
+
+
+
+
+# base compiler flags (common for CC and CXX and linking)
+BFLAGS = -O2 -Wall -Wdouble-promotion -Wno-unused-local-typedefs
+BFLAGS += -fsingle-precision-constant
+BFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4
+BFLAGS += -DARM_MATH_CM4 -D'__FPU_PRESENT=1'
+BFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+BFLAGS += -DHSE_VALUE=16000000UL # is this needed/used?
+BFLAGS += -fno-common -fno-exceptions -ffunction-sections -fdata-sections
+BFLAGS += -flto -ffast-math
+BFLAGS += $(TARGET_FLAGS)
+
+# CC-specific compiler flags (not linking!)
+CFLAGS = -std=c99
+CFLAGS += $(PROJECT_C_FLAGS)
+# CXX-specific compiler flags (not linking!)
+CXXFLAGS = $(PROJECT_CXX_FLAGS)
+CXXFLAGS +=
+
+# linker-specific flags
+LDFLAGS = --static -Wl,--gc-sections
+LDFLAGS += -Wl,-Map,$(BUILDDIR)/$(PROJNAME).map
+LDFLAGS += -T$(LDSCRIPT)
+LDFLAGS += -lm -lnosys
+LDFLAGS += -specs=nano.specs -u _printf_float # If size if an issue
+
+AFLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4
+ODFLAGS	= -x --syms
+CPFLAGS = --output-target=binary
+
+
+
+
+# collect list of C source files
+_CSRCS = $(wildcard $(DIR_STM32FXXX_C)/user/*/*.c)
+_CSRCS += $(wildcard $(DIR_STM32FXXX_C)/cpal/*/*.c)
+_CSRCS += $(wildcard $(DIR_STM32FXXX_C)/st/*/*.c)
+_CSRCS += $(wildcard $(DIR_STM32FXXX_C)/m4/*/*.c)
+
+_CSRCS += $(wildcard $(DIR_STM32_C)/user/*/*.c)
+_CSRCS += $(wildcard $(DIR_STM32_C)/dsp/*/*.c)
+_CSRCS += $(wildcard $(DIR_STM32_C)/usb/*/*.c)
+
+_CSRCS += $(wildcard $(DIR_COMMON_C)/user/*/*.c)
+ifdef USER_LIB
+	_CSRCS += $(wildcard $(DIR_USER_LIB_C)/*/*.c)
+endif
+
+
+_CSRCS += $(wildcard src/*.c)
+
+CSRCS = $(notdir $(_CSRCS))
+
+CSRCS += startup_$(TARGET_SUFFIX).s
+
+
+
+
+# collect list of C++ source files
+_CXXSRCS = $(wildcard $(DIR_STM32FXXX_CPP)/user/*/*.cpp)
+_CXXSRCS += $(wildcard $(DIR_STM32_CPP)/user/*/*.cpp)
+_CXXSRCS += $(wildcard $(DIR_COMMON_CPP)/user/*/*.cpp)
+ifdef USER_LIB
+	_CXXSRCS += $(wildcard $(DIR_USER_LIB_CPP)/*/*.cpp)
+endif
+
+_CXXSRCS += $(wildcard src/*.cpp)
+
+CXXSRCS = $(notdir $(_CXXSRCS))
+
+
+
+
+# collect list of C objects
+_COBJS = $(patsubst %.c,$(BUILDDIR)/%.o,$(CSRCS))
+COBJS = $(patsubst %.s,$(BUILDDIR)/%.o,$(_COBJS))
+
+# collect list of C++ objects
+_CXXOBJS = $(patsubst %.cpp,$(BUILDDIR)/%.o,$(CXXSRCS))
+CXXOBJS = $(patsubst %.s,$(BUILDDIR)/%.o,$(_CXXOBJS))
+
+VPATH := $(sort $(dir $(_CSRCS) $(_CXXSRCS)))
+
+
+#------------------------------------------------------------------------------
+.PHONY: proj disassemble serialflash flash clean cleanlib
+
+all: proj
+ifeq ($(OS),Windows_NT)
+	@$(SZ) $(BUILDDIR)/$(PROJNAME).elf
+else
+	@$(SZ) $(BUILDDIR)/$(PROJNAME).elf | tail -n 1 | awk '{print "Flash:\t", $$1+$$2, "\t[",($$1+$$2)*100/(128*1024),"% ]", "\nRAM:\t", $$2+$$3, "\t[",($$2+$$3)*100/(24*1024),"% ]"}'
+endif
+	@echo "[>--BinaryGenerated--<]"
+
+proj: $(BUILDDIR)/$(PROJNAME).elf
+
+$(BUILDDIR)/$(PROJNAME).elf: $(COBJS) $(CXXOBJS)
+	@echo "  [ELF] $@"
+	@$(CXX) $(BFLAGS) $(CFLAGS) $(COBJS) $(CXXFLAGS) $(CXXOBJS) $(CXXFLAGS) -o $@ $(LDFLAGS)
+	@$(OBJCPY) $(CPFLAGS) $(BUILDDIR)/$(PROJNAME).elf $(BUILDDIR)/$(PROJNAME).bin
+
+disassemble: proj
+	@$(OBJDMP) $(ODFLAGS) $(BUILDDIR)/$(PROJNAME).elf > $(BUILDDIR)/$(PROJNAME).dmp
+	@$(OBJDMP) -dS $(BUILDDIR)/$(PROJNAME).elf > $(BUILDDIR)/$(PROJNAME).dis
+
+$(COBJS): | $(BUILDDIR)
+
+$(CXXOBJS): | $(BUILDDIR)
+
+$(BUILDDIR):
+#ifeq ($(OS),Windows_NT)
+#@If Not Exist "$(BUILDDIR)" (mkdir "$(BUILDDIR)")
+#else
+	@mkdir -p $(BUILDDIR)
+#endif
+
+$(BUILDDIR)/%.o: %.c
+	@echo "  [CC]  $^"
+	@$(CC) $(INCLUDES) $(BFLAGS) $(CFLAGS) -c -o $@ $^
+
+$(BUILDDIR)/%.o: %.cpp
+	@echo "  [CXX] $^"
+	@$(CXX) $(INCLUDES) $(BFLAGS) $(CXXFLAGS) -c -o $@ $^
+
+$(BUILDDIR)/startup_$(TARGET_SUFFIX).o: $(STARTUP)
+	@$(AS) $(AFLAGS) $(STARTUP) -o $@
+
+serialflash: all
+	@echo "[>-Downloading to $(TARGET_SUFFIX)-<]"
+	@./extra/stm32loader.py -p $(PORT) -evw "$(BUILDDIR)/$(PROJNAME).bin"
+
+flash: all
+	@echo "[>-Downloading to $(TARGET_SUFFIX)-<]"
+ifeq ($(OS),Windows_NT)
+	@"../../../tools/dfu-util/dfu-util" -d 0483:df11 -a 0 -s 0x08000000 -D "$(BUILDDIR)/$(PROJNAME).bin"
+else
+	@ls -l $(BUILDDIR)/$(PROJNAME).bin
+	@sudo dfu-util -d 0483:df11 -a 0 -s 0x08000000 -D "$(BUILDDIR)/$(PROJNAME).bin"
+endif
+	@echo "[>-----$(TARGET_SUFFIX) Loaded-----<]"
+
+clean:
+#ifeq ($(OS),Windows_NT)
+#@If Exist "$(BUILDDIR)" rd /S /Q $(BUILDDIR)
+#else
+	@rm -fr $(BUILDDIR)
+#endif

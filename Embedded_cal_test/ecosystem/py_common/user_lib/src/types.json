@@ -1,0 +1,203 @@
+[
+  {
+    "field_names": ["micro_t", "wx", "wy", "wz", "ax", "ay", "az"],
+    "field_units": ["s", "bit", "bit", "bit", "bit", "bit", "bit"],
+    "field_types": "fhhhhhh",
+    "type_byte": 20,
+    "type_name": "imu_raw"
+  },
+  
+  {
+    "field_names": ["micro_t", "wx", "wy", "wz", "ax", "ay", "az"],
+    "field_units": ["s", "rad/s", "rad/s", "rad/s", "m/s2", "m/s2", "m/s2"],
+    "field_types": "fffffff",
+    "type_byte": 21,
+    "type_name": "imu_metric"
+  },
+    
+  {
+    "field_names": ["ax", "ay", "az", "wx", "wy", "wz"],
+    "field_units": ["bit", "bit", "bit", "bit", "bit", "bit"],
+    "field_types": "hhhhhh",
+    "type_byte": 22,
+    "type_name": "imu_offset"
+  },
+  
+  {
+    "field_names": ["ax", "ay", "az", "wx", "wy", "wz"],
+    "field_units": ["m/s2/bit", "m/s2/bit", "m/s2/bit", "rad/s/bit", "rad/s/bit", "rad/s/bit"],
+    "field_types": "ffffff",
+    "type_byte": 23,
+    "type_name": "imu_scale"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["micro_t", "wx", "wy", "wz", "qw", "qx", "qy", "qz"],
+    "field_units": ["s", "rad/s", "rad/s", "rad/s", "quat", "quat", "quat", "quat"],
+    "field_types": "ffffffff",
+    "type_byte": 25,
+    "type_name": "est_quat"
+  },
+
+  {
+    "field_names": ["micro_t", "wx", "wy", "wz", "roll", "pitch", "yaw"],
+    "field_units": ["s", "rad/s", "rad/s", "rad/s", "rad", "rad", "rad"],
+    "field_types": "fffffff",
+    "type_byte": 26,
+    "type_name": "est_euler"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["roll", "pitch", "yaw_rate", "thrust"],
+    "field_units": ["bit", "bit", "bit", "bit"],
+    "field_types": "hhhH",
+    "type_byte": 129,
+    "type_name": "rel_euler_pilot"
+  },
+
+  {
+    "field_names": ["roll", "pitch", "yaw", "thrust"],
+    "field_units": ["bit", "bit", "bit", "bit"],
+    "field_types": "hhhH",
+    "type_byte": 130,
+    "type_name": "abs_euler_pilot"
+  },
+
+  {
+    "field_names": ["magnitude", "direction", "thrust"],
+    "field_units": ["-", "rad", "bit"],
+    "field_types": "ffH",
+    "type_byte": 131,
+    "type_name": "open_pilot"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["rotor_phase_lead", "mo_cal_angle", "pulse_sat", "pulse_thresh", "pulse_min", "yaw_sat", "en_bottom"],
+    "field_units": ["rad", "rad", "-", "-", "-", "-", "bool"],
+    "field_types": "ffffffB",
+    "type_byte": 141,
+    "type_name": "pulsing_coax_param"
+  },
+
+  {
+    "field_names": ["t", "wx_meas", "wx_est", "wx_filt", "ex_est", "ex_des",  "ux_p", "ux_d", "top_mean", "bottom_mean",  "u_amp", "u_phase"],
+    "field_units": ["s", "rad/s",   "rad/s",  "rad/s",   "rad",    "rad",       "-",    "-",    "-",        "-",            "-",     "-"],
+    "field_types": "ffffffffffff",
+    "type_byte": 142,
+    "type_name": "roll_report"
+  },
+
+  {
+    "field_names": ["t", "wz_meas", "wz_est", "wz_filt", "ez_est", "ez_des",  "uz_p", "uz_d", "uz_f", "top_mean", "bottom_mean"],
+    "field_units": ["s", "rad/s",   "rad/s",  "rad/s",   "rad",    "rad",     "-",    "-",    "-",    "-",        "-"],
+    "field_types": "fffffffffff",
+    "type_byte": 143,
+    "type_name": "yaw_report"
+  },
+
+  {
+    "field_names": ["t", "top_mean", "bottom_mean", "u_amp", "u_phase", "top_speed"],
+    "field_units": ["s", "-",        "-",           "-",     "rad",     "rad/s"],
+    "field_types": "ffffff",
+    "type_byte": 144,
+    "type_name": "motor_report"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["f0_yaw", "f1_yaw", "f2_yaw", "p_yaw", "d_yaw", "p_roll", "d_roll", "w_tau", "en_attitude", "en_yaw"],
+    "field_units": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"],
+    "field_types": "ffffffffBB",
+    "type_byte": 151,
+    "type_name": "euler_ortho_pd_param"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["freq"],
+    "field_units": ["Hz"],
+    "field_types": "f",
+    "type_byte": 162,
+    "type_name": "loop_freq"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["roll", "yaw", "attitude", "imu_raw", "imu_metric", "est_euler", "motor", "battery_voltage", "loop_profile", "loop_freq"],
+    "field_units": ["bool", "bool", "bool", "bool", "bool", "bool", "bool", "bool", "bool", "bool"],
+    "field_types": "BBBBBBBBBB",
+    "type_byte": 171,
+    "type_name": "uav_reporter_param"
+  },
+
+
+
+
+
+
+  {
+    "field_names": ["micro_t", "voltage", "current", "power", "energy"],
+    "field_units": ["s", "volts", "amps", "watts", "joules"],
+    "field_types": "fffff",
+    "type_byte": 181,
+    "type_name": "battery_power"
+  },
+
+  {
+    "field_names": ["micro_t", "voltage"],
+    "field_units": ["s", "volts"],
+    "field_types": "ff",
+    "type_byte": 182,
+    "type_name": "battery_voltage"
+  },
+
+
+
+
+
+
+
+
+  {
+    "field_names": ["t", "des_roll",  "roll", "roll_rate",  "roll_rate_filt", "ux_p",  "ux_d", "des_pitch",  "pitch",  "pitch_rate",  "pitch_rate_filt",  "uy_p",  "uy_d",  "top_pulse_amp"],
+    "field_units": ["s", "-",         "rad",  "rad/s",      "rad/s",          "-",     "-",    "rad",        "rad",    "rad/s",       "rad/s",            "-",     "-",     "-"],
+    "field_types": "ffffffffffffff",
+    "type_byte": 999,
+    "type_name": "PCCE_attitude_report"
+  },
+
+  {
+    "field_names": ["t", "pilot_roll", "pilot_pitch", "pilot_yaw_rate", "pilot_thrust", "yaw_des", "top_mean", "top_pulse_amp", "top_pulse_phase", "bottom_mean"],
+    "field_units": ["s", "rad", "rad", "rad/s", "-", "rad", "-", "-", "rad", "-"],
+    "field_types": "fbbbBfffff",
+    "type_byte": 999,
+    "type_name": "PCCE_debug_control_var"
+  }
+]

@@ -1,0 +1,16 @@
+Python Packet Utils Package:
+  This might be a good place for useful things ....
+
+
+Notes: 
+  - [some string] means substitute in your configuration specific information without the []
+  - the token "$" means "execute this command in your bash shell"
+
+Setup:
+  $ cd to the ecosystem directory
+  echo "export ECOSYSTEM_PATH=$PWD" >> ~/.bashrc
+
+  Another acceptable way to do this:
+    - $ echo "export ECOSYSTEM_PATH=[your path to ppr_code]" >> ~/.bashrc
+  For instance, on my machine:
+    - $ echo "export ECOSYSTEM_PATH=/home/ujb/Projects/ppr_code" >> ~/.bashrc

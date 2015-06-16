@@ -1,0 +1,65 @@
+[
+  {
+    "field_names": ["micro_t", "ax", "ay", "az", "wx", "wy", "wz"],
+    "field_units": ["s", "bit", "bit", "bit", "bit", "bit", "bit"],
+    "field_types": "fhhhhhh",
+    "type_byte": 3,
+    "type_name": "imu_raw"
+  },
+  
+  {
+    "field_names": ["micro_t", "ax", "ay", "az", "wx", "wy", "wz"],
+    "field_units": ["s", "m/s2", "m/s2", "m/s2", "rad/s", "rad/s", "rad/s"],
+    "field_types": "fffffff",
+    "type_byte": 4,
+    "type_name": "imu_metric"
+  },
+  
+  {
+    "field_names": ["micro_t", "qw", "qx", "qy", "qz", "wx", "wy", "wz"],
+    "field_units": ["s", "quat", "quat", "quat", "quat", "rad/s", "rad/s", "rad/s"],
+    "field_types": "ffffffff",
+    "type_byte": 5,
+    "type_name": "state_est"
+  },
+  
+  {
+    "field_names": ["ax", "ay", "az", "wx", "wy", "wz"],
+    "field_units": ["bit", "bit", "bit", "bit", "bit", "bit"],
+    "field_types": "hhhhhh",
+    "type_byte": 6,
+    "type_name": "imu_offset"
+  },
+  
+  {
+    "field_names": ["ax", "ay", "az", "wx", "wy", "wz"],
+    "field_units": ["m/s2/bit", "m/s2/bit", "m/s2/bit", "rad/s/bit", "rad/s/bit", "rad/s/bit"],
+    "field_types": "ffffff",
+    "type_byte": 7,
+    "type_name": "imu_scale"
+  },
+  
+  {
+    "field_names": ["QuadA", "QuadB", "QuadA_p", "QuadB_p", "ADC1", "ADC2", "Direction", "Displacement"],
+    "field_units": ["bit", "bit", "bit", "bit", "bit", "bit", "bit", "bit"],
+    "field_types": "BBBBHHbH",
+    "type_byte": 8,
+    "type_name": "encoder"
+  },
+  
+  {
+    "field_names": ["uint8", "int8", "uint16", "int16", "uint32", "int32", "float"],
+    "field_units": ["bit", "bit", "bit", "bit", "bit", "bit", "bit"],
+    "field_types": "BbHhIif",
+    "type_byte": 128,
+    "type_name": "test_types"
+  },
+  
+  {
+    "field_names": ["Altitude", "Bias"],
+    "field_units": ["float", "float"],
+    "field_types": "ff",
+    "type_byte": 9,
+    "type_name": "barometer"
+  }
+]
