@@ -23,7 +23,7 @@ void cali_on_mode(void) {
 	
 	//store min max	
 	//should use the interrupt for the loop
-	for(i=0; i<1000; i++) {
+	for(i=0; i<10000; i++) {
 		adc0 = return_adc0();
 		adc1 = return_adc1();
 		if (adc0_min > adc0) adc0_min = adc0;
@@ -41,7 +41,7 @@ void cali_on_mode(void) {
 	error_180_temp = error_0;
 
 	//store adc_0 adc_180
-	for(i=0; i<1000; i++) {
+	for(i=0; i<10000; i++) {
 		adc0 = return_adc0();
 		adc1 = return_adc1();
 		error_0_temp = 1.0*adc0 / (adc0_max - adc0_min) + 1.0*adc1 / (adc1_max - adc1_min) - 1;

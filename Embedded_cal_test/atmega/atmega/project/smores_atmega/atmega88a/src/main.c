@@ -165,6 +165,11 @@ void process_twi(void)
             case SEND_ADC_DATA:
                 current_position = return_current_position();
                 current_velocity = return_current_velocity();
+                break;
+
+            case CALI_ON:
+                cali_on_mode();
+                break;
 #ifndef BOTTOM_FACE
                 adc0 = return_adc0();
                 adc1 = return_adc1();

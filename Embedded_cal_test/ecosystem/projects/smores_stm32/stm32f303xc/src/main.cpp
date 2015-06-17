@@ -19,6 +19,8 @@
 #include "Wheel_Control.h"
 #include "Trajectory.h"
 
+#include "common_macro.h"
+#include "stm_cali.h"
 //#define TELECONTROL
 //#define POSITION_CONTROL
 //#define SPEED_CONTROL
@@ -35,19 +37,8 @@
 #define TOP_FACE 23  // top
 #define BOTTOM_FACE 24  // bottom
 
-/*   face i2c address macros:  */
-#define BOTTOM_FACE_I2C_ADDRESS 0x0B
-#define LEFT_FACE_I2C_ADDRESS   0x0A
-#define RIGHT_FACE_I2C_ADDRESS  0x0C
-#define TOP_FACE_I2C_ADDRESS    0x0D
-
-/*   face board macros:   */
-#define MAGNETS_ON  0xA2
-#define MAGNETS_OFF 0xA3
-#define FACE_PING   0xA5
 
 // feecback cmd
-#define GET_STATES 0xA4
 
 #define UPDATE_GOAL 10
 #define SEND_DATA   20
@@ -969,6 +960,10 @@ int main (void){
                         break;
                 }
             }
+            else if (type == MsgCalibrationType) {
+                cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
+            }
+
             usb.DropPacket();
         }
         if(is_data) {

@@ -103,4 +103,6 @@ typedef struct __attribute__ ((__packed__)) {
     uint8_t speed;
 }MsgTorque;
 
+const uint8_t MsgCalibrationType = 112;
+
 #endif // PROJECT_MESSAGE_TYPES_H
