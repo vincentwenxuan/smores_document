@@ -228,20 +228,36 @@ int main (void){
     
     Motor_Init(left_pan_tilt_motor);
 
-    right_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
+    // right_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
+    // right_wheel_motor.GPIO_Direction_Pin = GPIO_Pin_10;
+    // right_wheel_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOA;
+    // right_wheel_motor.GPIO_PWM_GPIOx = GPIOA;
+    // right_wheel_motor.GPIO_PWM_Pin = GPIO_Pin_9;
+    // right_wheel_motor.GPIO_PWM_PinSource = GPIO_PinSource9;
+    // right_wheel_motor.GPIO_PWM_AF = GPIO_AF_6;
+    // right_wheel_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOA;
+    // right_wheel_motor.TIMx = TIM1;
+    // right_wheel_motor.TIMx_Channel = TIM_Channel_2;
+    // right_wheel_motor.TIMx_RCC = RCC_APB2Periph_TIM1;
+    // right_wheel_motor.TIMx_Mode = TIM_OCMode_PWM1;
+    // right_wheel_motor.direction = Bit_RESET;
+    // right_wheel_motor.speed = 0;
+
+        right_wheel_motor.GPIO_Direction_GPIOx = GPIOA;
     right_wheel_motor.GPIO_Direction_Pin = GPIO_Pin_10;
     right_wheel_motor.GPIO_Direction_RCC = RCC_AHBPeriph_GPIOA;
-    right_wheel_motor.GPIO_PWM_GPIOx = GPIOA;
-    right_wheel_motor.GPIO_PWM_Pin = GPIO_Pin_9;
-    right_wheel_motor.GPIO_PWM_PinSource = GPIO_PinSource9;
-    right_wheel_motor.GPIO_PWM_AF = GPIO_AF_6;
-    right_wheel_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOA;
-    right_wheel_motor.TIMx = TIM1;
-    right_wheel_motor.TIMx_Channel = TIM_Channel_2;
-    right_wheel_motor.TIMx_RCC = RCC_APB2Periph_TIM1;
+    right_wheel_motor.GPIO_PWM_GPIOx = GPIOB;
+    right_wheel_motor.GPIO_PWM_Pin = GPIO_Pin_5;
+    right_wheel_motor.GPIO_PWM_PinSource = GPIO_PinSource5;
+    right_wheel_motor.GPIO_PWM_AF = GPIO_AF_10;
+    right_wheel_motor.GPIO_PWM_RCC = RCC_AHBPeriph_GPIOB;
+    right_wheel_motor.TIMx = TIM17;
+    right_wheel_motor.TIMx_Channel = TIM_Channel_1;
+    right_wheel_motor.TIMx_RCC = RCC_APB2Periph_TIM17;
     right_wheel_motor.TIMx_Mode = TIM_OCMode_PWM1;
     right_wheel_motor.direction = Bit_RESET;
-    right_wheel_motor.speed = 0;
+     right_wheel_motor.speed = 0;
+
 
     Motor_Init(right_wheel_motor);
 
@@ -431,8 +447,21 @@ int main (void){
                 }
                 else if (rx_msg->cmd == AUTOCALI) {
                     mBlueON;
-                    DelayMilliseconds(2000);
+                    DelayMilliseconds(1000);
+                    mBlueTOGGLE;
+                    DelayMilliseconds(1000);
+                    mBlueTOGGLE;
+                    DelayMilliseconds(1000);
+                    mBlueTOGGLE;
+                    DelayMilliseconds(1000);
+                    mBlueTOGGLE;
+                    DelayMilliseconds(1000);
+                    power_on_flag = 0;
                     cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
+                    
+                    // set_motor_direction(right_wheel_motor, Bit_RESET);
+                    // set_motor_speed(right_wheel_motor, 40);
+                   
                     mBlueOFF;
                 }
             }
