@@ -6,25 +6,25 @@
 
 #include "common_peripherals.h"
 #include "TWI_slave.h"
-//#include "drive_coil.h"
+#include "drive_coil.h"
 #include "wiper_encoder.h"
-#include "common_macro.h"
 #include "atm_cali.h"
 
 //#define BOTTOM_FACE
 
- unsigned char My_Address;
+unsigned char My_Address;
 
- unsigned char messageBuf[TWI_BUFFER_SIZE];
+unsigned char messageBuf[TWI_BUFFER_SIZE];
 
- // DIRECTION coil1_direction;
- // DIRECTION coil2_direction;
- // DIRECTION coil3_direction;
- // DIRECTION coil4_direction;
+DIRECTION coil1_direction;
+DIRECTION coil2_direction;
+DIRECTION coil3_direction;
+DIRECTION coil4_direction;
 
- void process_twi(void);
- int main(void)
- {
+void process_twi(void);
+
+int main(void)
+{
     /* insert your hardware initialization here */
     m_clockdivide(0);
     InitPeripherals();
@@ -60,15 +60,15 @@
     
     init_wiper_encoder();
     
-    // unsigned int frequency = 166;
-    // float duty_cycle = 0.5;
-    // unsigned int pulse_number = 3;
-    // init_coil(frequency, duty_cycle, pulse_number);
+    unsigned int frequency = 166;
+    float duty_cycle = 0.5;
+    unsigned int pulse_number = 3;
+    init_coil(frequency, duty_cycle, pulse_number);
 
-    // coil1_direction = STOP;
-    // coil2_direction = STOP;
-    // coil3_direction = STOP;
-    // coil4_direction = STOP;
+    coil1_direction = STOP;
+    coil2_direction = STOP;
+    coil3_direction = STOP;
+    coil4_direction = STOP;
     
     m_green(ON);m_yellow(ON);m_blue(ON);
     m_wait(1000);
@@ -84,7 +84,6 @@
 
 void process_twi(void)
 {
-    int j;
     unsigned char twi_data_state[7];
 #ifndef BOTTOM_FACE
     unsigned char twi_data_adc[11];
@@ -104,53 +103,53 @@ void process_twi(void)
             TWI_Get_Data_From_Transceiver(messageBuf, 1);
             switch(messageBuf[0])
             {
-                // case MAGNETS_ON:
-                // m_green(ON);
-                // coil1_direction = PLUS;
-                // drive_coil1(coil1_direction);
-                // m_wait(20);
-                // coil2_direction = PLUS;
-                // drive_coil2(coil2_direction);
-                // m_wait(20);
-                // coil3_direction = PLUS;
-                // drive_coil3(coil3_direction);
-                // m_wait(20);
-                // coil4_direction = PLUS;
-                // drive_coil4(coil4_direction);
-                // m_wait(20);
-                // drive_coil1(STOP);
-                // drive_coil2(STOP);
-                // drive_coil3(STOP);
-                // drive_coil4(STOP);
-                // break;
-                // case MAGNETS_OFF:
-                // m_green(OFF);
-                // coil1_direction = MINUS;
-                // drive_coil1(coil1_direction);
-                // m_wait(20);
-                // coil2_direction = MINUS;
-                // drive_coil2(coil2_direction);
-                // m_wait(20);
-                // coil3_direction = MINUS;
-                // drive_coil3(coil3_direction);
-                // m_wait(20);
-                // coil4_direction = MINUS;
-                // drive_coil4(coil4_direction);
-                // m_wait(20);
-                // drive_coil1(STOP);
-                // drive_coil2(STOP);
-                // drive_coil3(STOP);
-                // drive_coil4(STOP);
-                // break;
-                case FACE_PING:
+            /*case MAGNETS_ON:
+                m_green(ON);
+                coil1_direction = PLUS;
+                drive_coil1(coil1_direction);
+                m_wait(20);
+                coil2_direction = PLUS;
+                drive_coil2(coil2_direction);
+                m_wait(20);
+                coil3_direction = PLUS;
+                drive_coil3(coil3_direction);
+                m_wait(20);
+                coil4_direction = PLUS;
+                drive_coil4(coil4_direction);
+                m_wait(20);
+                drive_coil1(STOP);
+                drive_coil2(STOP);
+                drive_coil3(STOP);
+                drive_coil4(STOP);
+                break;
+            case MAGNETS_OFF:
+                m_green(OFF);
+                coil1_direction = MINUS;
+                drive_coil1(coil1_direction);
+                m_wait(20);
+                coil2_direction = MINUS;
+                drive_coil2(coil2_direction);
+                m_wait(20);
+                coil3_direction = MINUS;
+                drive_coil3(coil3_direction);
+                m_wait(20);
+                coil4_direction = MINUS;
+                drive_coil4(coil4_direction);
+                m_wait(20);
+                drive_coil1(STOP);
+                drive_coil2(STOP);
+                drive_coil3(STOP);
+                drive_coil4(STOP);
+                break;
+            case FACE_PING:
                 // send a response back
                 ; // I need to put this in order to declare a variable next (?!?!!)
                 m_blue(TOGGLE);
                 unsigned char twi_data;
                 twi_data = My_Address;
                 TWI_Start_Transceiver_With_Data(&twi_data, 1);
-                break;
-                case SEND_STATES:
+                break;*/
+            case SEND_STATES:
                 current_position = return_current_position();
                 current_velocity = return_current_velocity();
                 twi_data_state[0]=(current_velocity & 0x000000FF);
@@ -163,12 +162,9 @@ void process_twi(void)
                 TWI_Start_Transceiver_With_Data(twi_data_state, 7);
                 break;
 
-                case SEND_ADC_DATA:
+            case SEND_ADC_DATA:
                 current_position = return_current_position();
                 current_velocity = return_current_velocity();
-
-
-
 #ifndef BOTTOM_FACE
                 adc0 = return_adc0();
                 adc1 = return_adc1();
@@ -202,20 +198,6 @@ void process_twi(void)
                 twi_data_adc[8]=0xAA;
                 TWI_Start_Transceiver_With_Data(twi_data_adc, 9);
 #endif
-
-                break;
-                case CALI_ON:
-                
-                for(j=0;j<6;j++) {
-                    m_blue(TOGGLE);
-                    m_wait(500);
-                }
-                cali_on_mode();
-                break;
-
-                case CALI_OFF:
-                cali_off_mode();
-                
                 break;
             }
         }

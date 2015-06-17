@@ -12,7 +12,7 @@
 #include "common_peripherals.h"
 #include "ADC.h"
 #include <stdlib.h>
-#include "medfilt.h"
+//#include "medfilt.h"
 
 void init_wiper_encoder(void);
 int return_current_position(void);

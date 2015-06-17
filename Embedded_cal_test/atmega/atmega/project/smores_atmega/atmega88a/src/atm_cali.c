@@ -1,34 +1,12 @@
-/* Name: main.c
- * Author: <insert your name here>
- * Copyright: <insert your copyright message here>
- * License: <insert your license reference here>
- */
 
-//#define BOTTOM_FACE
-#include "atm_cali.h"
-
-int adc0_min = 1000;
-int adc1_min = 1000;
-int adc0_max = 0;
-int adc1_max = 0;
-int adc0_0 = 0;
-int adc1_0 = 0;
-int adc0_180 = 0;
-int adc1_180 = 0;
-
-void cali_on_mode(void) {
-	int adc0 = 0;
-	int adc1 = 0;
-	int i;
-	
 	//store min max	
 	//should use the interrupt for the loop
 	for(i=0; i<10000; i++) {
 		adc0 = return_adc0();
 		adc1 = return_adc1();
-		if (adc0_min > adc0) adc0_min = adc0;
+		if (adc0_min > adc0 && adc0 >15) adc0_min = adc0;
 		if (adc0_max < adc0) adc0_max = adc0;
-		if (adc1_min > adc1) adc1_min = adc1;
+		if (adc1_min > adc1 && adc1 >15) adc1_min = adc1;
 		if (adc1_max < adc1) adc1_max = adc1;
 	}
 
