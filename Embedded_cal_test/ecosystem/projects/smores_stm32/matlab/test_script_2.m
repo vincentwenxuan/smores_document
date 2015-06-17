@@ -7,7 +7,7 @@ addpath ../../../mat_common/user_lib/src/
 addpath ../../../mat_common/user_lib/mex/
 
 %% initial UsbCom object
-UsbCom = usb_com('com', '/dev/tty.usbmodem1451');
+UsbCom = usb_com('com', '/dev/tty.usbmodem1411');
 % UsbCom = usb_com('com', '/dev/ttyACM0');
 % com = MessageInterface('/dev/tty.usbmodem1411');
 % UsbCom = usb_com('com', com);

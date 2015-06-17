@@ -14,8 +14,12 @@ void cali_cmd(Motor left_wheel_motor, Motor right_wheel_motor, Motor right_pan_t
 	// control the motor
 	set_motor_direction(left_wheel_motor, Bit_RESET);
 	set_motor_direction(right_wheel_motor, Bit_SET);
-	set_motor_speed(left_wheel_motor, 20);
-	set_motor_speed(right_wheel_motor, 20);
+	set_motor_direction(left_pan_tilt_motor, Bit_SET);
+	set_motor_direction(right_pan_tilt_motor, Bit_SET);
+	set_motor_speed(left_wheel_motor, 60);
+	set_motor_speed(right_wheel_motor, 60);
+	set_motor_speed(left_pan_tilt_motor, 60);
+	set_motor_speed(right_pan_tilt_motor, 60);
 
 	//wait some seconds
 	DelayMilliseconds(10000);

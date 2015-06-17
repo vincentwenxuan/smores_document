@@ -431,11 +431,9 @@ int main (void){
                 }
                 else if (rx_msg->cmd == AUTOCALI) {
                     mBlueON;
-                    mYellowON;
                     DelayMilliseconds(2000);
                     cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
                     mBlueOFF;
-                    mYellowOFF;
                 }
             }
             // magnet control 
