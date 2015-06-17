@@ -947,6 +947,7 @@ int main (void){
                         init_flag_pan = 0;
                         if (rx_msg->direction)
                         {
+                  
                             set_motor_direction(left_pan_tilt_motor, Bit_SET);
                             set_motor_direction(right_pan_tilt_motor, Bit_SET);
                         }
