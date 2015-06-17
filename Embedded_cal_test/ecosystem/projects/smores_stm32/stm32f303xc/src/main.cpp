@@ -429,6 +429,14 @@ int main (void){
                     usb.SendPacket(MsgModuleType, (uint8_t*)&tx_msg, sizeof(tx_msg));
                     is_data = 1;
                 }
+                else if (rx_msg->cmd == AUTOCALI) {
+                    mBlueON;
+                    mYellowON;
+                    DelayMilliseconds(2000);
+                    cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
+                    mBlueOFF;
+                    mYellowOFF;
+                }
             }
             // magnet control 
             else if (type == MsgMagnetType) {
@@ -961,14 +969,7 @@ int main (void){
                         break;
                 }
             }
-            else if (type == MsgCalibrationType) {
-                mBlueON;
-                mYellowON;
-                DelayMilliseconds(2000);
-                cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
-                mBlueOFF;
-                mYellowOFF;
-            }
+
 
             usb.DropPacket();
         }
