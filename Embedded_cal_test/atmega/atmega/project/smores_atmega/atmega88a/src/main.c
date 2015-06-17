@@ -6,7 +6,7 @@
 
 #include "common_peripherals.h"
 #include "TWI_slave.h"
-#include "drive_coil.h"
+//#include "drive_coil.h"
 #include "wiper_encoder.h"
 #include "atm_cali.h"
 
@@ -16,10 +16,10 @@ unsigned char My_Address;
 
 unsigned char messageBuf[TWI_BUFFER_SIZE];
 
-DIRECTION coil1_direction;
-DIRECTION coil2_direction;
-DIRECTION coil3_direction;
-DIRECTION coil4_direction;
+// DIRECTION coil1_direction;
+// DIRECTION coil2_direction;
+// DIRECTION coil3_direction;
+// DIRECTION coil4_direction;
 
 void process_twi(void);
 
@@ -65,10 +65,10 @@ int main(void)
     unsigned int pulse_number = 3;
     init_coil(frequency, duty_cycle, pulse_number);
 
-    coil1_direction = STOP;
-    coil2_direction = STOP;
-    coil3_direction = STOP;
-    coil4_direction = STOP;
+    // coil1_direction = STOP;
+    // coil2_direction = STOP;
+    // coil3_direction = STOP;
+    // coil4_direction = STOP;
     
     m_green(ON);m_yellow(ON);m_blue(ON);
     m_wait(1000);
@@ -103,44 +103,44 @@ void process_twi(void)
             TWI_Get_Data_From_Transceiver(messageBuf, 1);
             switch(messageBuf[0])
             {
-            case MAGNETS_ON:
-                m_green(ON);
-                coil1_direction = PLUS;
-                drive_coil1(coil1_direction);
-                m_wait(20);
-                coil2_direction = PLUS;
-                drive_coil2(coil2_direction);
-                m_wait(20);
-                coil3_direction = PLUS;
-                drive_coil3(coil3_direction);
-                m_wait(20);
-                coil4_direction = PLUS;
-                drive_coil4(coil4_direction);
-                m_wait(20);
-                drive_coil1(STOP);
-                drive_coil2(STOP);
-                drive_coil3(STOP);
-                drive_coil4(STOP);
-                break;
-            case MAGNETS_OFF:
-                m_green(OFF);
-                coil1_direction = MINUS;
-                drive_coil1(coil1_direction);
-                m_wait(20);
-                coil2_direction = MINUS;
-                drive_coil2(coil2_direction);
-                m_wait(20);
-                coil3_direction = MINUS;
-                drive_coil3(coil3_direction);
-                m_wait(20);
-                coil4_direction = MINUS;
-                drive_coil4(coil4_direction);
-                m_wait(20);
-                drive_coil1(STOP);
-                drive_coil2(STOP);
-                drive_coil3(STOP);
-                drive_coil4(STOP);
-                break;
+            // case MAGNETS_ON:
+            //     m_green(ON);
+            //     coil1_direction = PLUS;
+            //     drive_coil1(coil1_direction);
+            //     m_wait(20);
+            //     coil2_direction = PLUS;
+            //     drive_coil2(coil2_direction);
+            //     m_wait(20);
+            //     coil3_direction = PLUS;
+            //     drive_coil3(coil3_direction);
+            //     m_wait(20);
+            //     coil4_direction = PLUS;
+            //     drive_coil4(coil4_direction);
+            //     m_wait(20);
+            //     drive_coil1(STOP);
+            //     drive_coil2(STOP);
+            //     drive_coil3(STOP);
+            //     drive_coil4(STOP);
+            //     break;
+            // case MAGNETS_OFF:
+            //     m_green(OFF);
+            //     coil1_direction = MINUS;
+            //     drive_coil1(coil1_direction);
+            //     m_wait(20);
+            //     coil2_direction = MINUS;
+            //     drive_coil2(coil2_direction);
+            //     m_wait(20);
+            //     coil3_direction = MINUS;
+            //     drive_coil3(coil3_direction);
+            //     m_wait(20);
+            //     coil4_direction = MINUS;
+            //     drive_coil4(coil4_direction);
+            //     m_wait(20);
+            //     drive_coil1(STOP);
+            //     drive_coil2(STOP);
+            //     drive_coil3(STOP);
+            //     drive_coil4(STOP);
+            //     break;
             case FACE_PING:
                 // send a response back
                 ; // I need to put this in order to declare a variable next (?!?!!)
