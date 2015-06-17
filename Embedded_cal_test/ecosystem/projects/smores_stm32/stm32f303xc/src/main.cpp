@@ -459,8 +459,7 @@ int main (void){
                     power_on_flag = 0;
                     cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
                     
-                    // set_motor_direction(right_wheel_motor, Bit_RESET);
-                    // set_motor_speed(right_wheel_motor, 40);
+                
                    
                     mBlueOFF;
                 }
