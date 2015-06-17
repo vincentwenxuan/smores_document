@@ -22,7 +22,6 @@ unsigned char messageBuf[TWI_BUFFER_SIZE];
 // DIRECTION coil4_direction;
 
 void process_twi(void);
-
 int main(void)
 {
     /* insert your hardware initialization here */
@@ -84,6 +83,7 @@ int main(void)
 
 void process_twi(void)
 {
+    int j;
     unsigned char twi_data_state[7];
 #ifndef BOTTOM_FACE
     unsigned char twi_data_adc[11];
@@ -168,8 +168,17 @@ void process_twi(void)
                 break;
 
             case CALI_ON:
+                
+                for(j=0;j<6;j++) {
+                    m_blue(TOGGLE);
+                    m_wait(1000);
+            }
                 cali_on_mode();
                 break;
+            case CALI_OFF:
+                cali_off_mode();
+                break;
+
 #ifndef BOTTOM_FACE
                 adc0 = return_adc0();
                 adc1 = return_adc1();

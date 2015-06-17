@@ -62,6 +62,15 @@ void cali_on_mode(void) {
 }
 
 void cali_off_mode(void) {
-	//save to EEPROM
+	float resulo_0 = 1.0*(adc0_180 - adc0_0)/180;
+	float resulo_1 = 1.0*(adc1_180 - adc0_0)/180;
+	USART_Transmit_int(adc0_0);
+	USART_Transmit_char(' ');
+	USART_Transmit_int(adc0_180);
+	USART_Transmit_char(' ');
+	USART_Transmit_int(adc1_0);
+	USART_Transmit_char(' ');
+	USART_Transmit_int(adc1_180);
+    USART_Transmit_string("\n\r");
 }
 
