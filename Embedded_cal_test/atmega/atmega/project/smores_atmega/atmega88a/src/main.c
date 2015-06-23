@@ -206,14 +206,18 @@ void process_twi(void)
                 break;
                 case CALI_ON:
                 
-                for(j=0;j<6;j++) {
+                for(j=0;j<4;j++) {
                     m_blue(TOGGLE);
-                    m_wait(500);
+                    m_wait(100);
                 }
                 cali_on_mode();
                 break;
 
                 case CALI_OFF:
+                for(j=0;j<4;j++) {
+                    m_green(TOGGLE);
+                    m_wait(100);
+                }
                 cali_off_mode();
                 
                 break;

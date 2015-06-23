@@ -22,7 +22,7 @@ void cali_cmd(Motor left_wheel_motor, Motor right_wheel_motor, Motor right_pan_t
 	set_motor_speed(right_pan_tilt_motor, 60);
 
 	//wait some seconds
-	DelayMilliseconds(10000);
+	DelayMilliseconds(20000);
 
 	//stop
 	set_motor_speed(left_wheel_motor, 0);
