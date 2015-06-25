@@ -17,6 +17,7 @@
 
  unsigned char messageBuf[TWI_BUFFER_SIZE];
 
+
  // DIRECTION coil1_direction;
  // DIRECTION coil2_direction;
  // DIRECTION coil3_direction;
@@ -96,6 +97,8 @@ void process_twi(void)
     long current_velocity = 0;
     int adc0 = 0;
     int adc1 = 0;
+    int adc2 = 0;
+    int adc3 = 0;
     if ( ! TWI_Transceiver_Busy() )
     {
         if ( TWI_statusReg.RxDataInBuf )
@@ -164,20 +167,26 @@ void process_twi(void)
                 break;
 
                 case SEND_ADC_DATA:
-                current_position = return_current_position();
-                current_velocity = return_current_velocity();
+                //current_position = return_current_position();
+                //current_velocity = return_current_velocity();
 
 
 
 #ifndef BOTTOM_FACE
-                adc0 = return_adc0();
-                adc1 = return_adc1();
-                twi_data_adc[0]=(current_velocity & 0x000000FF);
-                twi_data_adc[1]=((current_velocity & 0x0000FF00)>>8);
-                twi_data_adc[2]=((current_velocity & 0x00FF0000)>>16);
-                twi_data_adc[3]=((current_velocity & 0xFF000000)>>24);
-                twi_data_adc[4]=((current_position) & 0x00FF);
-                twi_data_adc[5]=((current_position & 0xFF00)>>8);
+                adc0 = return_adc0_0();
+                adc1 = return_adc0_180();
+                adc2 = return_adc1_0();
+                adc3 = return_adc1_180();
+                twi_data_adc[0]=0x0000;//(adc2 & 0x00FF);
+                twi_data_adc[1]=0x0000;//((adc2 & 0xFF00)>>8);
+                twi_data_adc[2]=(adc2 & 0x00FF);
+                twi_data_adc[3]=((adc2 & 0xFF00)>>8);
+                //twi_data_adc[4]=((current_position) & 0x00FF);
+                //twi_data_adc[5]=((current_position & 0xFF00)>>8);
+
+                twi_data_adc[4]=(adc3 & 0x00FF);
+                twi_data_adc[5]=((adc3 & 0xFF00)>>8);
+
                 twi_data_adc[6]=(adc0 & 0x00FF);
                 twi_data_adc[7]=((adc0 & 0xFF00)>>8);
                 twi_data_adc[8]=(adc1 & 0x00FF);
@@ -205,7 +214,8 @@ void process_twi(void)
 
                 break;
                 case CALI_ON:
-                
+                m_blue(ON);
+                m_green(OFF);
                 for(j=0;j<4;j++) {
                     m_blue(TOGGLE);
                     m_wait(100);
