@@ -2,10 +2,11 @@
 #define ATM_CALI_
 
 #include "wiper_encoder.h"
-#include "USART.h"
 #include "common_macro.h"
+#include "TWI_slave.h"
+#include <avr/eeprom.h>
 
-void cali_on_mode();
+void cali_mode();
 void cali_off_mode();
 int return_adc0_0();
 int return_adc1_0();
