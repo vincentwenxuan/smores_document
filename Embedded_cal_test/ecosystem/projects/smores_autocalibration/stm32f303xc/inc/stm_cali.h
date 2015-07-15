@@ -26,6 +26,6 @@
 #define TOP_FACE_PING    123
 #define BOTTOM_FACE_PING 124
 
-void cali_cmd(Motor left_wheel_motor, Motor right_wheel_motor, Motor right_pan_tilt_motor, Motor left_pan_tilt_motor);
+void cali_cmd(char address, Motor motor1, Motor motor2);
 
 #endif //STM_CALI_

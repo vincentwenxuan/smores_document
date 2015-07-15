@@ -3,7 +3,11 @@
 
 #include "common_message_types.h"
 
-#define AUTOCALI 50
+//Auto calibration command types
+#define AUTOCALI_LEFT 50
+#define AUTOCALI_RIGHT 51
+#define AUTOCALI_PAN 52
+#define AUTOCALI_TILT 53
 
 const uint8_t MsgCmdType = 101;
 typedef struct __attribute__ ((__packed__)) {

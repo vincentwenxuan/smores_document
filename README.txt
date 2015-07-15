@@ -16,3 +16,7 @@ Some head files and c/cpp files also changed or added.
 7. smores_wiper_encoder_test is used to show the 4 calibrated values (adc0_0, adc0_180, adc1_0, adc1_180)
 
 8. smores_wiper_encoder_calibration is the old version. (We found out the new version is not working at all. We cannot read the data from usb.)
+
+9. We put all the things to the smores_autocali (atmega part) and smores_autocalibration (stm32 part).
+
+10. We change the project_message_types.h, add the autocalibration command type

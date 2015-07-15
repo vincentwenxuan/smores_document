@@ -445,23 +445,21 @@ int main (void){
                     usb.SendPacket(MsgModuleType, (uint8_t*)&tx_msg, sizeof(tx_msg));
                     is_data = 1;
                 }
-                else if (rx_msg->cmd == AUTOCALI) {
-                    mBlueON;
-                    DelayMilliseconds(1000);
-                    mBlueTOGGLE;
-                    DelayMilliseconds(1000);
-                    mBlueTOGGLE;
-                    DelayMilliseconds(1000);
-                    mBlueTOGGLE;
-                    DelayMilliseconds(1000);
-                    mBlueTOGGLE;
-                    DelayMilliseconds(1000);
+                else if (rx_msg->cmd == AUTOCALI_LEFT) {
                     power_on_flag = 0;
-                    cali_cmd(left_wheel_motor, right_wheel_motor, right_pan_tilt_motor, left_pan_tilt_motor);
-                    
-                
-                   
-                    mBlueOFF;
+                    cali_cmd(LEFT_FACE_I2C_ADDRESS, left_wheel_motor, right_wheel_motor);
+                }
+                else if (rx_msg->cmd == AUTOCALI_RIGHT) {
+                    power_on_flag = 0;
+                    cali_cmd(RIGHT_FACE_I2C_ADDRESS, right_wheel_motor, left_wheel_motor);
+                }
+                else if (rx_msg->cmd == AUTOCALI_PAN) {
+                    power_on_flag = 0;
+                    cali_cmd(TOP_FACE_I2C_ADDRESS, left_pan_tilt_motor, right_pan_tilt_motor);
+                }
+                else if (rx_msg->cmd == AUTOCALI_TILT) {
+                    power_on_flag = 0;
+                    cali_cmd(BOTTOM_FACE_I2C_ADDRESS, left_pan_tilt_motor, right_pan_tilt_motor);        
                 }
             }
             // magnet control 

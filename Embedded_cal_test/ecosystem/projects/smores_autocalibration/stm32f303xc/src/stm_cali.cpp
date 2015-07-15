@@ -3,54 +3,46 @@
 char slave_cmd;
 
 // when the calibration cmd is received, the program falls into a time loop.
-void cali_cmd(Motor left_wheel_motor, Motor right_wheel_motor, Motor right_pan_tilt_motor, Motor left_pan_tilt_motor) {
+void cali_cmd(char address, Motor motor1, Motor motor2) {
 	// set the Atmega to calibration mode
+	mBlueON;
 	slave_cmd = CALI_ON;
-	mBusWriteNoAdd(BOTTOM_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(LEFT_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(RIGHT_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(TOP_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	
+	mBusWriteNoAdd(address << 1, slave_cmd, 1);
+
 	// control the motor
-	set_motor_direction(left_wheel_motor, Bit_RESET);
-	set_motor_direction(right_wheel_motor, Bit_SET);
-	set_motor_direction(left_pan_tilt_motor, Bit_SET);
-	set_motor_direction(right_pan_tilt_motor, Bit_SET);
-	set_motor_speed(left_wheel_motor, 60);
-	set_motor_speed(right_wheel_motor, 60);
-	set_motor_speed(left_pan_tilt_motor, 60);
-	set_motor_speed(right_pan_tilt_motor, 60);
+	if (address == LEFT_FACE_I2C_ADDRESS || address == RIGHT_FACE_I2C_ADDRESS) {
+		set_motor_direction(motor1, Bit_SET);
+		set_motor_speed(motor1, 60);
+	}
+	else if (address == TOP_FACE_I2C_ADDRESS) {
+		set_motor_direction(motor1, Bit_SET);
+		set_motor_speed(motor1, 60);
+		set_motor_direction(motor2, Bit_SET);
+		set_motor_speed(motor2, 60);
+	}
 
 	//wait some seconds
-	
 	DelayMilliseconds(25000);
 	mYellowON;
 	slave_cmd = CALI_SWITCH;
-	mBusWriteNoAdd(BOTTOM_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(LEFT_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(RIGHT_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(TOP_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
+	mBusWriteNoAdd(address << 1, slave_cmd, 1);
 	DelayMilliseconds(25000);
 	mYellowOFF;
 
 	//stop
-	set_motor_speed(left_wheel_motor, 0);
-	set_motor_speed(right_wheel_motor, 0);
-	set_motor_speed(left_pan_tilt_motor, 0);
-	set_motor_speed(right_pan_tilt_motor, 0);
+	set_motor_speed(motor1, 0);
+	set_motor_speed(motor2, 0);
 
 	//wait some seconds
 	DelayMilliseconds(1000);
 
 	// tell the Atmega to finish the calibration mode
 	slave_cmd = CALI_OFF;
-	mBusWriteNoAdd(BOTTOM_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(LEFT_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(RIGHT_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
-	mBusWriteNoAdd(TOP_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
+	mBusWriteNoAdd(address << 1, slave_cmd, 1);
 	
 	//wait some seconds
 	DelayMilliseconds(1000);
+	mBlueOFF;
 
 	//check if the EEPROM get the calibration parameter
 	//mBusRead.....
