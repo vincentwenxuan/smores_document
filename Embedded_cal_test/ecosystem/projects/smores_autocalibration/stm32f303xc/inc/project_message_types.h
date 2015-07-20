@@ -7,7 +7,9 @@
 #define AUTOCALI_LEFT 50
 #define AUTOCALI_RIGHT 51
 #define AUTOCALI_PAN 52
-#define AUTOCALI_TILT 53
+#define AUTOCALI_TILT_M90 53
+#define AUTOCALI_TILT_0 54
+#define AUTOCALI_TILT_90 55
 
 const uint8_t MsgCmdType = 101;
 typedef struct __attribute__ ((__packed__)) {

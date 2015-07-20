@@ -457,9 +457,17 @@ int main (void){
                     power_on_flag = 0;
                     cali_cmd(TOP_FACE_I2C_ADDRESS, left_pan_tilt_motor, right_pan_tilt_motor);
                 }
-                else if (rx_msg->cmd == AUTOCALI_TILT) {
+                else if (rx_msg->cmd == AUTOCALI_TILT_M90) {
                     power_on_flag = 0;
-                    cali_cmd(BOTTOM_FACE_I2C_ADDRESS, left_pan_tilt_motor, right_pan_tilt_motor);        
+                    cali_cmd_tilt(CALI_ON_TILT_M90);        
+                }
+                else if (rx_msg->cmd == AUTOCALI_TILT_0) {
+                    power_on_flag = 0;
+                    cali_cmd_tilt(CALI_ON_TILT_0);        
+                }
+                else if (rx_msg->cmd == AUTOCALI_TILT_90) {
+                    power_on_flag = 0;
+                    cali_cmd_tilt(CALI_ON_TILT_90);
                 }
             }
             // magnet control 

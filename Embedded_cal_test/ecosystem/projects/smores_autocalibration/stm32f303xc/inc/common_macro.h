@@ -18,5 +18,8 @@
 #define CALI_ON               0xA7
 #define CALI_SWITCH           0xA8
 #define CALI_OFF			  0xA9
+#define CALI_ON_TILT_M90	  0xAA
+#define CALI_ON_TILT_0        0xAB
+#define CALI_ON_TILT_90       0xAC
 
 #endif // COMMON_MACRO_H_

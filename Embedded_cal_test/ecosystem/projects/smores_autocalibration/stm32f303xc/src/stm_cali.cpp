@@ -47,3 +47,13 @@ void cali_cmd(char address, Motor motor1, Motor motor2) {
 	//check if the EEPROM get the calibration parameter
 	//mBusRead.....
 }
+
+// tilt calibration at 0 degrees. When the command received,
+// the adc value will be recorded to EEPROM immediately.
+void cali_cmd_tilt(char cmd) {
+	slave_cmd = cmd;
+	mBusWriteNoAdd(BOTTOM_FACE_I2C_ADDRESS << 1, slave_cmd, 1);
+}
+
+
+

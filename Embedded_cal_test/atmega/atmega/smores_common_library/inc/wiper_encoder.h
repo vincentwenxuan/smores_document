@@ -12,6 +12,7 @@
 #include "common_peripherals.h"
 #include "ADC.h"
 #include <stdlib.h>
+ #include <avr/eeprom.h>
 //#include "medfilt.h"
 
 void init_wiper_encoder(void);

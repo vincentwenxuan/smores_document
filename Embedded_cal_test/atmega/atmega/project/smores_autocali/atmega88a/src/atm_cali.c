@@ -1,5 +1,5 @@
 /* Name: main.c
- * Author: <insert your name here>
+ * Author: <Xiaojun Sun>
  * Copyright: <insert your copyright message here>
  * License: <insert your license reference here>
  */
@@ -18,7 +18,6 @@ uint16_t adc0_180 = 0;
 uint16_t adc1_180 = 0;
 
 void cali_mode() {
-
 	uint16_t adc0_raw = return_adc0();
 	uint16_t adc1_raw = return_adc1();
 	uint16_t adc0 = adc0_raw;
@@ -79,7 +78,7 @@ void cali_mode() {
 	adc0 = adc0_raw;
 	adc1 = adc1_raw;
 
-	//find the adc values at 0 degree adn 180 degree 
+	//find the adc values at 0 degree and 180 degree 
 	while (messageBuf[0] != CALI_OFF) {
 		if ( TWI_statusReg.RxDataInBuf )
             TWI_Get_Data_From_Transceiver(messageBuf, 1);
@@ -125,18 +124,35 @@ void cali_mode() {
 	eeprom_write_word((uint16_t*) 16, adc1_180);
 	m_wait(100);
 
-	// uint16_t adc0_0_e = eeprom_read_word((uint16_t*) 4);
-	// uint16_t adc1_0_e = eeprom_read_word((uint16_t*) 8);
-	// uint16_t adc0_180_e = eeprom_read_word((uint16_t*) 12);
-	// uint16_t adc1_180_e = eeprom_read_word((uint16_t*) 16);
-
-
 	m_green(OFF);
 }
 
 void cali_off_mode() {
 	float resulo_0 = 1.0*(adc0_180 - adc0_0)/180;
 	float resulo_1 = 1.0*(adc1_180 - adc0_0)/180;
+	eeprom_write_float((float*) 24, resulo_0);
+	m_wait(100);
+	eeprom_write_float((float*) 32, resulo_1);
+	m_wait(100);
+}
+
+// For tilt calibration, only adc0 is recorded
+void cali_on_tilt(int address) {
+	int j;
+	m_blue(ON);
+	for(j=0;j<4;j++) {
+    	m_blue(TOGGLE);
+    	m_wait(100);
+    }
+	adc0_0 = return_adc0();
+	eeprom_write_word((uint16_t*) address, adc0_0);
+	m_wait(100);
+	if (address == 12) {
+		float resulo_0 = 1.0*(return_adc0_180() - return_adc0_0())/180;
+		eeprom_write_float((float*) 24, resulo_0);
+		m_wait(100);
+	}
+	m_blue(OFF);
 }
 
 int return_adc0_0() {
@@ -153,5 +169,13 @@ int return_adc0_180() {
 
 int return_adc1_180() {
 	return eeprom_read_word((uint16_t*) 16); //adc1_180; uncomment if you wanna return the value without eeprom
+}
+
+float return_resolution_0() {
+	return eeprom_read_float((float*) 24);
+}
+
+float return_resolution_1() {
+	return eeprom_read_float((float*) 32);
 }
 

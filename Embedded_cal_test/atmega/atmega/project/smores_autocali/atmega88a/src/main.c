@@ -85,7 +85,6 @@
 
 void process_twi(void)
 {
-    int j;
     unsigned char twi_data_state[7];
 #ifndef BOTTOM_FACE
     unsigned char twi_data_adc[11];
@@ -213,14 +212,21 @@ void process_twi(void)
 #endif
 
                 break;
+                
                 case CALI_ON:
-                m_blue(ON);
-                m_green(OFF);
-                for(j=0;j<4;j++) {
-                    m_blue(TOGGLE);
-                    m_wait(100);
-                }
                 cali_mode();
+                break;
+
+                case CALI_ON_TILT_M90:
+                cali_on_tilt(4);
+                break;
+
+                case CALI_ON_TILT_0:
+                cali_on_tilt(8);
+                break;
+
+                case CALI_ON_TILT_90:
+                cali_on_tilt(12);
                 break;
             }
         }

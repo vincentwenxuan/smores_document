@@ -1,0 +1,10 @@
+The target face will rotate after the command is received, EXCEPT for tilt command.
+For left, right, pan calibraion, you just need to send the command and wait.
+For tilt calibration, three different commands need to be sended. And you need move the face manually.
+
+left face auto calibraion: 50
+right face auto calibration: 51
+pan auto calibration: 52
+tilt calibration at -90 degree: 53
+tilt calibration at 0 degree: 54
+tilt calibration at 90 degree: 55

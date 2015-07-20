@@ -27,5 +27,6 @@
 #define BOTTOM_FACE_PING 124
 
 void cali_cmd(char address, Motor motor1, Motor motor2);
+void cali_cmd_tilt(char cmd);
 
 #endif //STM_CALI_
