@@ -9,108 +9,23 @@
 
 //#define TILT_WIPER
 
-//#define ADC1_MIN  112  // -86
-//#define ADC1_MIN 101  // -91
-//#define ADC1_MAX 750  // 180
-//#define ADC1_MAX 884
-//#define ADC1_ZERO 341  // 0
-//#define ADC1_ZERO 359
-//#define ADC0_MIN  123  // -180
-//#define ADC0_MIN 129
-//#define ADC0_MAX  374  // -86
-//#define ADC0_MAX 393  // -91
+static int adc0_0_eeprom = 0;
+static int adc0_180_eeprom = 0;
+static int adc1_0_eeprom = 0;  // zero degree for tilt wiper
+static int adc1_180_eeprom = 0;
+static float resolu_0_eeprom = 0;
+static float resolu_1_eeprom = 0;
 
-/* #define ADC1_MIN 99 // -87 */
-/* #define ADC1_MAX 868  // 180 */
-/* #define ADC1_ZERO 352  // 0 */
-/* #define ADC0_MIN 116  // -180 */
-/* #define ADC0_MAX 385  // -87 */
+void get_eeprom() {
+    adc0_0_eeprom = eeprom_read_word((uint16_t*) 4);
+    adc1_0_eeprom = eeprom_read_word((uint16_t*) 8);
+    adc0_180_eeprom = eeprom_read_word((uint16_t*) 12);
+    adc1_180_eeprom = eeprom_read_word((uint16_t*) 16);
+    resolu_0_eeprom = eeprom_read_float((float*) 24);
+    resolu_1_eeprom = eeprom_read_float((float*) 32);
+}
 
-/* #define ADC1_MIN 124 // -88 */
-/* //#define ADC1_MAX 897  // 180 */
-/* #define ADC1_MAX 870 // -170 */
-/* #define ADC1_ZERO 380  // 0 */
-/* #define ADC0_MIN 146  // -180 */
-/* #define ADC0_MAX 412  // -88 */
-
-/* #define RESOLUTION_1 0.3467 */
-/* #define RESOLUTION_0 0.3459 */
-
-#ifndef TILT_WIPER
-// left wiper
-/* #define ADC1_MIN 486 // 0 */
-/* #define ADC1_MAX 916  // 180 */
-/* #define ADC0_MIN 145  // -180 */
-/* #define ADC0_MAX 683  // -90 */
-/* #define LOW 0 */
-
-/* #define RESOLUTION_1 0.4186 */
-/* #define RESOLUTION_0 0.3346 */
-
-/* #define ADC1_MIN 100 // -90 */
-/* #define ADC1_MAX 729  // 180 */
-/* //#define ADC1_ZERO   // 0 */
-/* #define ADC0_MIN 87  // -180 */
-/* #define ADC0_MAX 298  // -90 */
-/* #define LOW -90 */
-
-/* #define RESOLUTION_1 0.4293 */
-/* #define RESOLUTION_0 0.4265 */
-
-
-// right wiper
-/* #define ADC1_MIN 134 // -90 */
-/* #define ADC1_MAX 852  // 180 */
-/* #define ADC0_MIN 117  // -180 */
-/* #define ADC0_MAX 359  // -90 */
-/* #define LOW -90 */
-
-/* #define RESOLUTION_1 0.3760 */
-/* #define RESOLUTION_0 0.3719 */
-
-#define ADC1_MIN 365 // 0
-#define ADC1_MAX 890  // 180
-//#define ADC1_ZERO 404  // 0
-#define ADC0_MIN 107  // -180
-#define ADC0_MAX 616  // 0
 #define LOW 0
-
-#define RESOLUTION_1 0.3429
-#define RESOLUTION_0 0.3536
-
-
-// top wiper
-/* #define ADC1_MIN 352 // 0 */
-/* #define ADC1_MAX 901  // 180 */
-/* #define ADC0_MIN  85 // -180 */
-/* #define ADC0_MAX 561  // 0 */
-/* #define LOW 0 */
-
-/* #define RESOLUTION_1 0.3279 */
-/* #define RESOLUTION_0 0.3782 */
-
-/* #define ADC1_MIN 153 // -90 */
-/* #define ADC1_MAX 904  // 180 */
-/* #define ADC1_ZERO 380  // 0 */
-/* #define ADC0_MIN  142 // -180 */
-/* #define ADC0_MAX 377  // -90 */
-/* #define LOW -90 */
-
-/* #define RESOLUTION_1 0.3595 */
-/* #define RESOLUTION_0 0.3830 */
-#endif
-
-#ifdef TILT_WIPER
-#define ADC0_MIN  24
-#define ADC0_MAX  924
-#define ADC0_ZERO 474
-#define RESOLUTION_0  0.2
-
-/* #define ADC0_MIN  9 */
-/* #define ADC0_MAX  985 */
-/* #define ADC0_ZERO 497 */
-/* #define RESOLUTION_0  0.1844 */
-#endif
 
 #ifndef TILT_WIPER
 float return_position(int adc0, int adc1);
@@ -171,6 +86,17 @@ long return_current_velocity(void)
 {
     return current_velocity;
 }
+
+/* int return_adc0(void)
+{
+    return adc_value_return[0];
+}
+#ifndef TILT_WIPER
+int return_adc1(void)
+{
+    return adc_value_return[1];
+}
+#endif */
 
 int return_adc0(void)
 {
@@ -265,15 +191,15 @@ float return_position(int adc0, int adc1)
     float current_position;
 //    static int previous_adc1;
     static float previous_position;
-    if ((adc1 >= ADC1_MIN) && (adc1 <= ADC1_MAX) && (flag_adc0))
+    if ((adc1 >= adc1_0_eeprom) && (adc1 <= adc1_180_eeprom) && (flag_adc0))
     {
-        current_position = (adc1 - ADC1_MIN) * RESOLUTION_1 + LOW;
+        current_position = (adc1 - adc1_0_eeprom) * resolu_1_eeprom + LOW;
     }
     else
     {
         flag_adc0 = 0;
-        current_position = (adc0 - ADC0_MAX) * RESOLUTION_0 + LOW;
-        if((adc0 <= ADC0_MIN) || (adc0 >= ADC0_MAX))
+        current_position = (adc0 - adc0_180_eeprom) * resolu_0_eeprom + LOW;
+        if((adc0 <= adc0_0_eeprom) || (adc0 >= adc0_180_eeprom))
         {
             flag_adc0 = 1;
         }
@@ -281,7 +207,7 @@ float return_position(int adc0, int adc1)
     
     /* if(abs(adc1 - previous_adc1) > threshold) */
     /* { */
-    /*     current_position = (adc0 - ADC0_MAX) * RESOLUTION_0 - 86; */
+    /*     current_position = (adc0 - adc0_180_eeprom) * resolu_0_eeprom - 86; */
     /* } */
     
     if ((previous_position > 90) && (current_position <= 0))
@@ -300,7 +226,7 @@ float return_position(int adc0, int adc1)
 
     /* if (abs(current_position - previous_position) > 10) */
     /* { */
-    /*     current_position = (adc0 - ADC0_MAX) * RESOLUTION_0 - 86; */
+    /*     current_position = (adc0 - adc0_180_eeprom) * resolu_0_eeprom - 86; */
     /* } */
     
     current_position = 0.3*current_position + 0.7*previous_position;
@@ -327,7 +253,7 @@ float return_position(int adc0, int adc1)
     /* if (diff > threshold) */
     /* { */
     /*     m_blue(ON); */
-    /*     current_position = (adc0 - ADC0_MAX) * RESOLUTION_0 - 86; */
+    /*     current_position = (adc0 - adc0_180_eeprom) * resolu_0_eeprom - 86; */
     /* } */
     return current_position;
     //return diff;
@@ -340,7 +266,7 @@ float return_position(int adc0)
     static float previous_position = 0;
     adc_value_return[0] = adc0;
     float current_position = 0;
-    current_position = (adc0 - ADC0_ZERO) * RESOLUTION_0;
+    current_position = (adc0 - adc1_0_eeprom) * resolu_0_eeprom;
     current_position = 0.3*current_position + 0.7*previous_position;
     previous_position = current_position;
     return current_position;
