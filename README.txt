@@ -20,3 +20,7 @@ Some head files and c/cpp files also changed or added.
 9. We put all the things to the smores_autocali (atmega part) and smores_autocalibration (stm32 part).
 
 10. We change the project_message_types.h, add the autocalibration command type
+
+
+
+P.S. resolution calculation is wrong!!!
