@@ -128,8 +128,8 @@ void cali_mode() {
 }
 
 void cali_off_mode() {
-	float resulo_0 = 1.0*(adc0_180 - adc0_0)/180;
-	float resulo_1 = 1.0*(adc1_180 - adc0_0)/180;
+	float resulo_0 = 1.0*180/(adc0_180 - adc0_0);
+	float resulo_1 = 1.0*180/(adc1_180 - adc0_0);
 	eeprom_write_float((float*) 24, resulo_0);
 	m_wait(100);
 	eeprom_write_float((float*) 32, resulo_1);
