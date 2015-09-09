@@ -23,4 +23,4 @@ Some head files and c/cpp files also changed or added.
 
 
 
-P.S. resolution calculation is wrong!!!
+P.S. resolution calculation is wrong! (FIXED)
